@@ -1,29 +1,80 @@
-const Joi = require('joi');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
-const schemaClient = Joi.object({
-    nome: Joi.string().required().messages({
-        'any.required': 'O campo nome é obrigatório.'
-    }),
-    email: Joi.string().email().required().messages({
-        'string.email': 'O e-mail fornecido é inválido.',
-        'any.required': 'O campo e-mail é obrigatório.'
-    }),
-    cpf: Joi.string().length(11).pattern(/^[0-9]+$/).required().messages({
-        'string.length': 'O CPF deve ter 11 dígitos.',
-        'string.pattern.base': 'O CPF deve conter apenas números.',
-        'any.required': 'O campo CPF é obrigatório.'
-    })
-});
+const pool = require('../../infrastructure/persistence/Database');
+const { schemaCliente, schemaCPF } = require('../validation/schemas');
 
-const schemaCPF = Joi.object({
-    cpf: Joi.string().length(11).pattern(/^[0-9]+$/).required().messages({
-        'string.length': 'O CPF deve ter 11 dígitos.',
-        'string.pattern.base': 'O CPF deve conter apenas números.',
-        'any.required': 'O campo CPF é obrigatório.'
-    })
-})
+class Cliente {
+    constructor(nome, email, cpf) {
+        this.nome = nome;
+        this.email = email;
+        this.cpf = cpf;
+    }
 
-module.exports = {
-    schemaClient,
-    schemaCPF
-};
+    async cadastrar() {
+        try {
+            const { error } = schemaCliente.validate({ nome: this.nome, email: this.email, cpf: this.cpf });
+            if (error) {
+                throw new Error(error.details[0].message);
+            }
+    
+            const emailCadastrado = await this.verificarEmailExistente();
+            if (emailCadastrado) {
+                throw new Error("Cliente já cadastrado");
+            }
+    
+            const cpfCadastrado = await this.verificarCpfExistente();
+            if (cpfCadastrado) {
+                throw new Error("Cliente já cadastrado");
+            }
+    
+            const query = 'insert into clientes (nome, email, cpf) values ($1, $2, $3)';
+            await pool.query(query, [this.nome, this.email, this.cpf]);
+
+        } catch (error) {
+            return { error: "Erro ao cadastrar cliente: " + error.message };
+        }
+    }    
+
+    async identificar() {
+        try {
+            const { error } = schemaCPF.validate({ cpf: this.cpf });
+            if (error) {
+                throw new Error(error.details[0].message);
+            }
+
+            const cpfCadastrado = await this.verificarCpfExistente();
+            if (cpfCadastrado) {
+                return this.gerarToken();
+
+                //direcionar para página de pedidos
+            } else {
+                throw new Error("Cliente não encontrado");
+            }
+        } catch (error) {
+            throw new Error('Erro interno do servidor.');
+        }
+    }
+
+    async verificarEmailExistente() {
+        const emailConsultado = 'select * from clientes where email = $1';
+        const resultadoConsultaEmail = await pool.query(emailConsultado, [this.email]);
+
+        return resultadoConsultaEmail.rows.length > 0;
+    }
+
+    async verificarCpfExistente() {
+        const cpfConsultado = 'select * from clientes where cpf = $1';
+        const resultadoConsultaCpf = await pool.query(cpfConsultado, [this.cpf]);
+
+        return resultadoConsultaCpf.rows.length > 0;
+    }
+
+    gerarToken() {
+        const chaveSecreta = crypto.randomBytes(32).toString('hex');
+        const token = jwt.sign({ cpf: this.cpf }, chaveSecreta);
+        return token;
+    }
+}
+
+module.exports = Cliente;
