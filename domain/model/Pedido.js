@@ -1,54 +1,55 @@
-const { schemaPedidoDetalhado } = require("../validation/schemas");
+const { schemaPedidoCompleto } = require("../validation/schemas");
 
 class Pedido {
-    constructor(cliente_id, preco_total) {
+    constructor(cliente_id, detalhes_pedido) {
         this.cliente_id = cliente_id;
-        this.preco_total = preco_total;
-        this.itens = [];
+        this.detalhes_pedido = detalhes_pedido;
     }
 
     async adicionarItem(nome_produto, preco, quantidade) {
         try {
-            const { error } = schemaPedidoDetalhado.validate({
-                pedido_id: this.pedido_id,
-                nome_produto: nome_produto,
-                preco: preco,
-                quantidade: quantidade
+            const { error } = schemaPedidoCompleto.validate({
+                cliente_id: this.cliente_id,
+                detalhes_pedido: this.detalhes_pedido
             });
-
+            
             if (error) {
                 throw new Error(error.details[0].message);
             }
-
-            this.itens.push({
-                pedido_id: this.pedido_id,
+            
+            //Só se houver mais de um objeto na array de detalhes_pedido
+            this.detalhes_pedido.push({
                 nome_produto: nome_produto,
                 preco: preco,
                 quantidade: quantidade
             });
+
             return 'Item adicionado ao pedido com sucesso.';
         } catch (error) {
             throw new Error('Erro ao adicionar item ao pedido: ' + error.message);
         }
     }
 
+    calcularPrecoTotal() {
+        return this.detalhes_pedido.reduce((total, item) => total + (item.preco * item.quantidade), 0);
+    }
+
     async salvarPedido() {
         try {
-            const { error } = schemaPedido.validate({
-                cliente_id: this.cliente_id,
-                preco_total: this.preco_total
-            });
+            const preco_total = this.calcularPrecoTotal();
 
-            if (error) {
-                throw new Error(error.details[0].message);
+            const query = 'insert into pedidos (cliente_id, preco_total) values ($1, $2) RETURNING pedido_id';
+            const result = await pool.query(query, [this.cliente_id, preco_total]);
+            const pedido_id = result.rows[0].pedido_id;
+
+            const detalhes_query = 'insert into pedido_detalhado (pedido_id, nome_produto, preco, quantidade) values ($1, $2, $3, $4)';
+            for (const item of this.detalhes_pedido) {
+                await pool.query(detalhes_query, [pedido_id, item.nome_produto, item.preco, item.quantidade]);
             }
-
-            const query = 'insert into pedidos (cliente_id, preco_total) values ($1, $2)';
-            await pool.query(query, [this.cliente_id, this.preco_total]);
         } catch (error) {
             throw new Error('Erro ao salvar pedido no banco de dados: ' + error.message);
         }
     }
 }
 
-module.exports = Pedido
+module.exports = Pedido;

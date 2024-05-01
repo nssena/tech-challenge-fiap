@@ -27,52 +27,50 @@ const schemaCPF = Joi.object({
     })
 });
 
-// Esquema para a tabela 'pedidos'
-const schemaPedido = Joi.object({
-    cliente_id: Joi.number().integer().positive().required().messages({
-        'number.base': 'O ID do cliente deve ser um número',
-        'number.integer': 'O ID do cliente deve ser um número inteiro',
-        'number.positive': 'O ID do cliente deve ser um número positivo',
-        'any.required': 'O ID do cliente é obrigatório'
-    }),
-    preco_total: Joi.number().precision(2).positive().required().messages({
-        'number.base': 'O preço total do pedido deve ser um número',
-        'number.precision': 'O preço total do pedido deve ter no máximo duas casas decimais',
-        'number.positive': 'O preço total do pedido deve ser um número positivo',
-        'any.required': 'O preço total do pedido é obrigatório'
+// Esquema para o pedido detalhado
+const schemaDetalhesPedido = Joi.object({
+    detalhes_pedido: Joi.array().min(1).items(Joi.object({
+        nome_produto: Joi.string().required().messages({
+            'string.base': 'O nome do produto deve ser uma string.',
+            'any.required': 'O nome do produto é obrigatório.'
+        }),
+        preco: Joi.number().positive().required().messages({
+            'number.base': 'O preço deve ser um número.',
+            'number.positive': 'O preço deve ser um número positivo.',
+            'any.required': 'O preço é obrigatório.'
+        }),
+        quantidade: Joi.number().integer().positive().required().messages({
+            'number.base': 'A quantidade deve ser um número.',
+            'number.integer': 'A quantidade deve ser um número inteiro.',
+            'number.positive': 'A quantidade deve ser um número positivo.',
+            'any.required': 'A quantidade é obrigatória.'
+        })
+    })).required().messages({
+        'array.min': 'Pelo menos um detalhe de pedido deve ser fornecido.',
+        'any.required': 'Os detalhes do pedido são obrigatórios.'
     })
 });
 
-// Esquema para a tabela 'pedido_detalhado'
-const schemaPedidoDetalhado = Joi.object({
-    pedido_id: Joi.number().integer().positive().required().messages({
-        'number.base': 'O ID do pedido deve ser um número',
-        'number.integer': 'O ID do pedido deve ser um número inteiro',
-        'number.positive': 'O ID do pedido deve ser um número positivo',
-        'any.required': 'O ID do pedido é obrigatório'
+//Esquema para o pedido completo
+
+const schemaPedidoCompleto = Joi.object({
+    cliente_id: Joi.number().integer().positive().required().messages({
+        'number.base': 'O ID do cliente deve ser um número.',
+        'number.integer': 'O ID do cliente deve ser um número inteiro.',
+        'number.positive': 'O ID do cliente deve ser um número positivo.',
+        'any.required': 'O ID do cliente é obrigatório.'
     }),
-    nome_produto: Joi.string().max(100).required().messages({
-        'string.base': 'O nome do produto deve ser uma string',
-        'string.max': 'O nome do produto deve ter no máximo {#limit} caracteres',
-        'any.required': 'O nome do produto é obrigatório'
-    }),
-    preco: Joi.number().precision(2).positive().required().messages({
-        'number.base': 'O preço do produto deve ser um número',
-        'number.precision': 'O preço do produto deve ter no máximo duas casas decimais',
-        'number.positive': 'O preço do produto deve ser um número positivo',
-        'any.required': 'O preço do produto é obrigatório'
-    }),
-    quantidade: Joi.number().integer().positive().required().messages({
-        'number.base': 'A quantidade do produto deve ser um número',
-        'number.integer': 'A quantidade do produto deve ser um número inteiro',
-        'number.positive': 'A quantidade do produto deve ser um número positivo',
-        'any.required': 'A quantidade do produto é obrigatória'
-    })
+    detalhes_pedido: Joi.array()
+    //Corrigir essa validação
+
+    // .min(1).items(schemaDetalhesPedido).required().messages({
+    //     'array.min': 'Pelo menos um detalhe de pedido deve ser fornecido.',
+    //     'any.required': 'Os detalhes do pedido são obrigatórios.'
+    // })
 });
 
 module.exports = {
     schemaCliente,
     schemaCPF,
-    schemaPedido,
-    schemaPedidoDetalhado
+    schemaPedidoCompleto
 }
