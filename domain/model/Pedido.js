@@ -24,7 +24,6 @@ class Pedido {
                 quantidade: quantidade
             });
 
-            return 'Item adicionado ao pedido com sucesso.';
         } catch (error) {
             throw new Error('Erro ao adicionar item ao pedido: ' + error.message);
         }
