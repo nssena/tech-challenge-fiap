@@ -5,14 +5,11 @@ const fazerPedido = async (req, res) => {
 
     try {
         const pedido = new Pedido(cliente_id);
-        
-        // Adicionar cada detalhe do pedido
-        for (const detalhe of detalhes_pedido) {
-            await pedido.adicionarItemPedido(detalhe);
-        }
 
-        console.log(pedido.pedidos);
+        await pedido.adicionarItemPedido(detalhes_pedido);
 
+
+    console.log(pedido);
         return res.status(200).json({ mensagem: "Pedido feito com sucesso." });
     } catch (error) {
         return res.status(500).json({ mensagem: "Erro interno do servidor: " + error.message });

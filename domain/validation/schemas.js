@@ -87,8 +87,13 @@ const schemaItemPedido = Joi.object({
     })
 });
 
+const schemaDetalhesPedido = Joi.array().min(1).items(schemaItemPedido).required().messages({
+    'array.min': 'Pelo menos um detalhe de pedido deve ser fornecido.',
+    'any.required': 'Os detalhes do pedido são obrigatórios.'
+});
+
 module.exports = {
     schemaCliente,
     schemaCPF,
-    schemaItemPedido
+    schemaDetalhesPedido
 }

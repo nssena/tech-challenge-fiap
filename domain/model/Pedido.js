@@ -1,4 +1,4 @@
-const { schemaItemPedido } = require("../validation/schemas");
+const { schemaDetalhesPedido } = require("../validation/schemas");
 
 class Pedido {
     constructor(client_id) {
@@ -6,22 +6,18 @@ class Pedido {
         this.pedidos = [];
     }
 
-    async adicionarItemPedido(itemPedido) {
+    async adicionarItemPedido(detalhes_pedido) {
         try {
-            // Validar o item do pedido
-            await schemaItemPedido.validateAsync(itemPedido);
+            await schemaDetalhesPedido.validateAsync(detalhes_pedido);
             
-            //A validação tá deixando passar uma array vazia
+            for (const itemPedido of detalhes_pedido) {
+                const produtoExistenteIndex = this.pedidos.findIndex(pedido => pedido.nome_produto === itemPedido.nome_produto);
 
-            // Verificar se o nome do produto já existe na lista de pedidos
-            const produtoExistenteIndex = this.pedidos.findIndex(pedido => pedido.nome_produto === itemPedido.nome_produto);
-
-            if (produtoExistenteIndex !== -1) {
-                // Se o produto já existir, adicionar a quantidade
-                this.pedidos[produtoExistenteIndex].quantidade += itemPedido.quantidade;
-            } else {
-                // Se não existir, adicionar como um novo item de pedido
-                this.pedidos.push(itemPedido);
+                if (produtoExistenteIndex !== -1) {
+                    this.pedidos[produtoExistenteIndex].quantidade += itemPedido.quantidade;
+                } else {
+                    this.pedidos.push(itemPedido);
+                }
             }
 
         } catch (error) {
