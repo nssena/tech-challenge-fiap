@@ -67,10 +67,17 @@ const schemaProduto = Joi.object({
         'number.precision': 'O preço deve ter no máximo duas casas decimais.',
         'number.positive': 'O preço deve ser um valor positivo.'
     }),
-    categoria: Joi.string().trim().required().max(100).messages({
+    categoria_id: Joi.number().integer().positive().required().messages({
         'any.required': 'A categoria é obrigatória.',
-        'string.trim': 'A categoria não pode conter apenas espaços em branco.',
-        'string.max': 'A categoria deve ter no máximo {{#limit}} caracteres.'
+        'number.base': 'A categoria deve ser um número inteiro.',
+        'number.positive': 'A categoria deve ser um número positivo.'
+    }),
+    descricao: Joi.string().allow('').max(255).messages({
+        'string.max': 'A descrição deve ter no máximo {{#limit}} caracteres.'
+    }),
+    imagem: Joi.string().allow('').uri().max(255).messages({
+        'string.uri': 'A URL da imagem não é válida.',
+        'string.max': 'A URL da imagem deve ter no máximo {{#limit}} caracteres.'
     })
 })
 

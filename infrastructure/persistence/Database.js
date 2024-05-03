@@ -1,4 +1,4 @@
-const { Pool } = require ('pg')
+const { Pool } = require('pg')
 
 const pool = new Pool({
     host: 'localhost',
@@ -19,19 +19,6 @@ module.exports = pool
 //     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 // );
 
-// CREATE TABLE categorias (
-//     id SERIAL PRIMARY KEY,
-//     nome_categoria VARCHAR(100) NOT NULL
-// );
-
-// CREATE TABLE produtos (
-//     id SERIAL PRIMARY KEY,
-//     nome_produto VARCHAR(100) NOT NULL,
-//     preco DECIMAL(10, 2) NOT NULL,
-//     categoria_id INT NOT NULL,
-//     FOREIGN KEY (categoria_id) REFERENCES categorias(id)
-// );
-
 // CREATE TABLE pedidos (
 //     pedido_id SERIAL PRIMARY KEY,
 //     cliente_id INT NOT NULL,
@@ -49,3 +36,17 @@ module.exports = pool
 //     FOREIGN KEY (pedido_id) REFERENCES pedidos(pedido_id)
 // );
 
+// CREATE TABLE categorias (
+//     id SERIAL PRIMARY KEY,
+//     nome_categoria VARCHAR(100) NOT NULL
+// );
+
+// CREATE TABLE produtos (
+//     id SERIAL PRIMARY KEY,
+//     nome_produto VARCHAR(100) NOT NULL,
+//     preco DECIMAL(10, 2) NOT NULL,
+//     categoria_id INT NOT NULL,
+//     descricao TEXT,
+//     imagem VARCHAR(255),
+//     FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+// );
