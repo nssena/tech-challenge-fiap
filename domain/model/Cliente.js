@@ -17,24 +17,27 @@ class Cliente {
             if (error) {
                 throw new Error(error.details[0].message);
             }
-    
+
             const emailCadastrado = await this.verificarEmailExistente();
             if (emailCadastrado) {
                 throw new Error("Cliente já cadastrado");
             }
-    
+
             const cpfCadastrado = await this.verificarCpfExistente();
             if (cpfCadastrado) {
                 throw new Error("Cliente já cadastrado");
             }
-    
+
+            //tratar o erro dessa requisição
             const query = 'insert into clientes (nome, email, cpf) values ($1, $2, $3)';
             await pool.query(query, [this.nome, this.email, this.cpf]);
+
+            return true;
 
         } catch (error) {
             return { error: "Erro ao cadastrar cliente: " + error.message };
         }
-    }    
+    }
 
     async identificar() {
         try {

@@ -11,6 +11,7 @@ const cadastrarCliente = async (req, res) => {
         const cliente = new Cliente(nome, email, cpf);
         const resultadoCadastro = await cliente.cadastrar();
         
+        //rever essa "lógica"
         if (!resultadoCadastro) {
             const token = cliente.gerarToken();
             res.cookie('token', token, { httpOnly: true });
