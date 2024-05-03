@@ -1,4 +1,5 @@
 const { schemaDetalhesPedido } = require("../validation/schemas");
+const pool = require('../../infrastructure/persistence/Database');
 
 class Pedido {
     constructor(client_id) {
