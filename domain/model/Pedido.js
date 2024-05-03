@@ -4,12 +4,13 @@ class Pedido {
     constructor(client_id) {
         this.client_id = client_id;
         this.pedidos = [];
+        this.pedidosEnviados = [];
     }
 
     async adicionarItemPedido(detalhes_pedido) {
         try {
             await schemaDetalhesPedido.validateAsync(detalhes_pedido);
-            
+
             for (const itemPedido of detalhes_pedido) {
                 const produtoExistenteIndex = this.pedidos.findIndex(pedido => pedido.nome_produto === itemPedido.nome_produto);
 
@@ -25,26 +26,29 @@ class Pedido {
         }
     }
 
-    // calcularPrecoTotal() {
-    //     return this.detalhes_pedido.reduce((total, item) => total + (item.preco * item.quantidade), 0);
-    // }
+    async enviarPedidosParaBancoDeDados() {
+        try {
+            for (const pedido of this.pedidos) {
+                // Inserir pedido na tabela pedidos
+                const preco_total = pedido.preco * pedido.quantidade;
+                const queryPedido = 'INSERT INTO pedidos (cliente_id, preco_total) VALUES ($1, $2) RETURNING pedido_id';
+                const pedidoResult = await pool.query(queryPedido, [this.client_id, preco_total]);
+                const pedido_id = pedidoResult.rows[0].pedido_id;
 
-    // async salvarPedido() {
-    //     try {
-    //         const preco_total = this.calcularPrecoTotal();
+                // Inserir detalhes do pedido na tabela pedido_detalhado
+                const queryDetalhesPedido = 'INSERT INTO pedido_detalhado (pedido_id, nome_produto, preco, quantidade) VALUES ($1, $2, $3, $4)';
+                await pool.query(queryDetalhesPedido, [pedido_id, pedido.nome_produto, pedido.preco, pedido.quantidade]);
 
-    //         const query = 'insert into pedidos (cliente_id, preco_total) values ($1, $2) RETURNING pedido_id';
-    //         const result = await pool.query(query, [this.cliente_id, preco_total]);
-    //         const pedido_id = result.rows[0].pedido_id;
+                // Adicionar o pedido enviado à lista de pedidos enviados
+                this.pedidosEnviados.push(pedido);
+            }
+            // Limpar a lista de pedidos após enviá-los para o banco de dados
+            this.pedidos = [];
 
-    //         const detalhes_query = 'insert into pedido_detalhado (pedido_id, nome_produto, preco, quantidade) values ($1, $2, $3, $4)';
-    //         for (const item of this.detalhes_pedido) {
-    //             await pool.query(detalhes_query, [pedido_id, item.nome_produto, item.preco, item.quantidade]);
-    //         }
-    //     } catch (error) {
-    //         throw new Error('Erro ao salvar pedido no banco de dados: ' + error.message);
-    //     }
-    // }
+        } catch (error) {
+            throw new Error('Erro ao enviar pedidos para o banco de dados: ' + error.message);
+        }
+    }
 }
 
 module.exports = Pedido;
