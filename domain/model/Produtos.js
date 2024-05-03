@@ -34,7 +34,7 @@ class Produto {
             await pool.query(query, [this.nome_produto, this.preco, this.categoria_id, this.descricao, this.imagem]);
             
         } catch (error) {
-            throw new Error('Erro ao adicionar produto: ' + error.message);
+            throw new Error(error.message);
         }
     }    
 }
