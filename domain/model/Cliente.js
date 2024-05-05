@@ -30,9 +30,14 @@ class Cliente {
 
             //tratar o erro dessa requisição
             const query = 'insert into clientes (nome, email, cpf) values ($1, $2, $3)';
-            await pool.query(query, [this.nome, this.email, this.cpf]);
+            const novoClienteCadastrado = await pool.query(query, [this.nome, this.email, this.cpf]);
 
-            return true;
+
+            if (novoClienteCadastrado.rowCount > 0) {
+                return true;
+            } else {
+                return false;
+            }
 
         } catch (error) {
             return { error: "Erro ao cadastrar cliente: " + error.message };
@@ -49,8 +54,6 @@ class Cliente {
             const cpfCadastrado = await this.verificarCpfExistente();
             if (cpfCadastrado) {
                 return this.gerarToken();
-
-                //direcionar para página de pedidos
             } else {
                 throw new Error("Cliente não encontrado");
             }
