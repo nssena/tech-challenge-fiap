@@ -17,6 +17,28 @@ const adicionarProduto = async (req, res) => {
     }
 }
 
+const editarProduto = async (req, res) => {
+    const produto = req.params;
+
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
+const excluirProduto = async (req, res) => {
+    const produto = req.params;
+
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
 module.exports = {
-    adicionarProduto
+    adicionarProduto,
+    editarProduto,
+    excluirProduto
 }

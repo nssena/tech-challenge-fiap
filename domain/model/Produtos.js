@@ -36,7 +36,11 @@ class Produto {
     }
     //método de edição
     async editarProduto() {
-
+        try {
+            
+        } catch (error) {
+            
+        }
     }
 
     //método de remoção

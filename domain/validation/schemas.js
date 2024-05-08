@@ -30,9 +30,10 @@ const schemaCPF = Joi.object({
 //Schemas de pedido
 
 const schemaItemPedido = Joi.object({
-    nome_produto: Joi.string().required().messages({
-        'string.base': 'O nome do produto deve ser uma string.',
-        'any.required': 'O nome do produto é obrigatório.'
+    produto_id: Joi.number().integer().required().messages({
+        'number.base': 'O ID do produto deve ser um número inteiro.',
+        'number.integer': 'O ID do produto deve ser um número inteiro.',
+        'any.required': 'O ID do produto é obrigatório.'
     }),
     preco: Joi.number().positive().required().messages({
         'number.base': 'O preço deve ser um número.',

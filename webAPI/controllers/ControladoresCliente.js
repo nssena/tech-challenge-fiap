@@ -34,7 +34,9 @@ const identificarCliente = async (req, res) => {
     try {
         const token = await cliente.identificar();
         return res.status(200).json({ token })
-        // return res.redirect(302, '/novopedido?token=' + token);
+
+        // redirecionar para a página de pedidos ou apresentar um botão para a pessoa iniciar o pedido com o link da página de produtos
+
     } catch (error) {
         return res.status(500).json({ mensagem: "Erro ao identificar cliente: " + error.message });
     }
