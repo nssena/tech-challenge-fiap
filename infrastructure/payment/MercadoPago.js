@@ -3,7 +3,6 @@ const axios = require('axios');
 class MercadoPagoAPI {
     constructor() {
         this.accessToken = process.env.YOUR_ACCESS_TOKEN;
-        console.log(this.accessToken);
         this.baseURL = 'https://api.mercadopago.com';
         this.headers = {
             'Content-Type': 'application/json',

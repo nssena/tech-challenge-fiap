@@ -1,14 +1,51 @@
 const Pedido = require("../../domain/model/Pedido");
 
+
 const fazerPedido = async (req, res) => {
     const { cliente_id, detalhes_pedido } = req.body;
 
     try {
+// Chegar ao valor total do pedido
+        let totalPedido = 0;
+
+
+        for (const item of detalhes_pedido) {
+            totalPedido += item.preco * item.quantidade;
+        }
+
+        const dadosQrCode = {
+            "cash_out": {
+              "amount": 0
+            },
+            "description": "Purchase description.",
+            "external_reference": "reference_12345",
+            "items": [
+              {
+                "sku_number": "A123K9191938",
+                "category": "marketplace",
+                "title": "Point Mini",
+                "description": "This is the Point Mini",
+                "unit_price": 100,
+                "quantity": 1,
+                "unit_measure": "unit",
+                "total_amount": 100
+              }
+            ],
+            "notification_url": "https://www.yourserver.com/notifications",
+            "sponsor": {
+              "id": 84774673
+
+            },
+            "title": "Product order",
+            "total_amount": 100
+          };
+  
+
         const pedido = new Pedido(cliente_id);
 
         await pedido.adicionarItemPedido(detalhes_pedido);
 
-        //chamar gerador de QR code e retornar o QR code na resposta
+        await pedido.gerarQRCode(dadosQrCode);
         
         return res.status(200).json({ mensagem: "Pedido feito com sucesso." });
     } catch (error) {

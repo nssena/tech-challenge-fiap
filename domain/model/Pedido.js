@@ -1,5 +1,7 @@
 const { schemaDetalhesPedido } = require("../validation/schemas");
 const pool = require('../../infrastructure/persistence/Database');
+const mercadopago = require("../../infrastructure/payment/MercadoPago");
+require('dotenv').config();
 
 class Pedido {
     constructor(client_id) {
@@ -8,7 +10,7 @@ class Pedido {
         this.pedidosEnviados = [];
     }
 
-    async adicionarItemPedido(detalhes_pedido) {
+    async adicionarItemPedido(detalhes_pedido, dadosQrCode) {
         try {
             await schemaDetalhesPedido.validateAsync(detalhes_pedido);
 
@@ -22,11 +24,22 @@ class Pedido {
                 }
             }
 
-        //gerar QR Code para pagamento do pedido
+            const qrCode = await this.gerarQRCode(dadosQrCode);
+
+            console.log("QR Code gerado:", qrCode);
 
         } catch (error) {
             throw new Error('Erro ao adicionar item ao pedido: ' + error.message);
         }
+    }
+
+    async gerarQRCode(dadosQrCode) {
+        const user_id = process.env.USER_ID;
+        const external_pos_id = process.env.EXTERNAL_POS_ID
+
+        const apiUrl = `instore/orders/qr/seller/collectors/${user_id}/pos/${external_pos_id}/qrs`;
+
+        mercadopago.APIPost(apiUrl, dadosQrCode)
     }
 
     async enviarPedidosParaBancoDeDados() {
@@ -39,7 +52,7 @@ class Pedido {
                 const pedidoResult = await pool.query(queryPedido, [this.client_id, preco_total]);
                 const pedido_id = pedidoResult.rows[0].pedido_id;
 
-                
+
                 // Inserir detalhes do pedido na tabela pedido_detalhado
                 const queryDetalhesPedido = 'INSERT INTO pedido_detalhado (pedido_id, produto_id, preco, quantidade) VALUES ($1, $2, $3, $4)';
                 await pool.query(queryDetalhesPedido, [pedido_id, pedido.produto_id, pedido.preco, pedido.quantidade]);
@@ -56,4 +69,19 @@ class Pedido {
     }
 }
 
+
 module.exports = Pedido;
+
+// function gerarQRCode() {
+//     const user_id = process.env.USER_ID;
+//     const external_pos_id = process.env.EXTERNAL_POS_ID
+
+//     const apiUrl = `instore/orders/qr/seller/collectors/${user_id}/pos/${external_pos_id}/qrs`;
+
+//     console.log(apiUrl);
+
+//     mercadopago.APIPost(apiUrl, dadosQrCode)
+// }
+
+// gerarQRCode()
+
