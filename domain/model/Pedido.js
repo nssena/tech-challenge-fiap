@@ -1,7 +1,7 @@
 const { schemaDetalhesPedido } = require("../validation/schemas");
 const pool = require('../../infrastructure/persistence/Database');
-const mercadopago = require("../../infrastructure/payment/MercadoPago");
-require('dotenv').config();
+const { MercadoPagoAPI, QrCode } = require("./MercadoPago");
+require('dotenv').config(); 
 
 class Pedido {
     constructor(client_id) {
@@ -10,7 +10,7 @@ class Pedido {
         this.pedidosEnviados = [];
     }
 
-    async adicionarItemPedido(detalhes_pedido, dadosQrCode) {
+    async adicionarItemPedido(detalhes_pedido) {
         try {
             await schemaDetalhesPedido.validateAsync(detalhes_pedido);
 
@@ -24,22 +24,22 @@ class Pedido {
                 }
             }
 
-            const qrCode = await this.gerarQRCode(dadosQrCode);
-
-            console.log("QR Code gerado:", qrCode);
-
         } catch (error) {
             throw new Error('Erro ao adicionar item ao pedido: ' + error.message);
         }
     }
 
-    async gerarQRCode(dadosQrCode) {
+    async gerarQRCode(detalhes_pedido) {
         const user_id = process.env.USER_ID;
-        const external_pos_id = process.env.EXTERNAL_POS_ID
+        const external_pos_id = process.env.EXTERNAL_POS_ID;
+
+        const dadosQrCode = new QrCode(detalhes_pedido).toJSON()
 
         const apiUrl = `instore/orders/qr/seller/collectors/${user_id}/pos/${external_pos_id}/qrs`;
 
-        mercadopago.APIPost(apiUrl, dadosQrCode)
+        const resposta = await MercadoPagoAPI.APIPost(apiUrl,dadosQrCode)
+        console.log(resposta);
+        return resposta;
     }
 
     async enviarPedidosParaBancoDeDados() {
@@ -71,17 +71,3 @@ class Pedido {
 
 
 module.exports = Pedido;
-
-// function gerarQRCode() {
-//     const user_id = process.env.USER_ID;
-//     const external_pos_id = process.env.EXTERNAL_POS_ID
-
-//     const apiUrl = `instore/orders/qr/seller/collectors/${user_id}/pos/${external_pos_id}/qrs`;
-
-//     console.log(apiUrl);
-
-//     mercadopago.APIPost(apiUrl, dadosQrCode)
-// }
-
-// gerarQRCode()
-

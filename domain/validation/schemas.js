@@ -35,10 +35,11 @@ const schemaItemPedido = Joi.object({
         'number.integer': 'O ID do produto deve ser um número inteiro.',
         'any.required': 'O ID do produto é obrigatório.'
     }),
-    preco: Joi.number().positive().required().messages({
-        'number.base': 'O preço deve ser um número.',
-        'number.positive': 'O preço deve ser um número positivo.',
-        'any.required': 'O preço é obrigatório.'
+    preco: Joi.number().integer().positive().required().messages({
+        'any.required': 'O preço é obrigatório.',
+        'number.base': 'O preço deve ser um número inteiro.',
+        'number.integer': 'O preço deve ser um número inteiro.',
+        'number.positive': 'O preço deve ser um número positivo.'
     }),
     quantidade: Joi.number().integer().positive().required().messages({
         'number.base': 'A quantidade deve ser um número.',
@@ -62,11 +63,11 @@ const schemaProduto = Joi.object({
         'string.trim': 'O nome do produto não pode conter apenas espaços em branco.',
         'string.max': 'O nome do produto deve ter no máximo {{#limit}} caracteres.'
     }),
-    preco: Joi.number().precision(2).positive().required().messages({
+    preco: Joi.number().integer().positive().required().messages({
         'any.required': 'O preço é obrigatório.',
-        'number.base': 'O preço deve ser um número.',
-        'number.precision': 'O preço deve ter no máximo duas casas decimais.',
-        'number.positive': 'O preço deve ser um valor positivo.'
+        'number.base': 'O preço deve ser um número inteiro.',
+        'number.integer': 'O preço deve ser um número inteiro.',
+        'number.positive': 'O preço deve ser um número positivo.'
     }),
     categoria_id: Joi.number().integer().positive().required().messages({
         'any.required': 'A categoria é obrigatória.',
