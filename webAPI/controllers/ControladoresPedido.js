@@ -14,8 +14,6 @@ const fazerPedido = async (req, res) => {
 
     await pedido.gerarQRCode(detalhes_pedido);
 
-    
-
     return res.status(200).json({ mensagem: "Pedido feito com sucesso." });
   } catch (error) {
     return res.status(500).json({ mensagem: "Erro interno do servidor: " + error.message });

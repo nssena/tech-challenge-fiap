@@ -1,12 +1,9 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const accessTokenfora = process.env.YOUR_ACCESS_TOKEN
-const sponsoridfora = process.env.SPONSOR_ID
-
 class MercadoPagoAPI {
     constructor() {
-        this.accessToken = accessTokenfora;
+        this.accessToken = process.env.YOUR_ACCESS_TOKEN;
         this.baseURL = 'https://api.mercadopago.com';
         this.headers = {
             'Content-Type': 'application/json',
@@ -64,10 +61,10 @@ class QrCode {
             category: " ",
             title: " ",
             description: " ",
-            unit_price: item.preco,
+            unit_price: item.preco / 100,
             quantity: item.quantidade,
             unit_measure: " ",
-            total_amount: item.preco * item.quantidade
+            total_amount: (item.preco / 100) * item.quantidade
         }));
         this.notification_url = "https://www.seuserver.com/notificacoes";
         this.sponsor = {
@@ -82,7 +79,9 @@ class QrCode {
         for (const item of detalhes_pedido) {
             totalCentavos += item.preco * item.quantidade;
         }
-        return totalCentavos;
+
+        const totalReais = totalCentavos /100
+            return totalReais;
     }
 
     toJSON() {
@@ -98,6 +97,7 @@ class QrCode {
         };
     }
 }
+
 
 module.exports = {
     MercadoPagoAPI: new MercadoPagoAPI(),
