@@ -1,5 +1,7 @@
 const axios = require('axios');
 require('dotenv').config();
+const { v4: uuidv4 } = require('uuid');
+
 
 class MercadoPagoAPI {
     constructor() {
@@ -55,7 +57,7 @@ class QrCode {
             amount: 0
         };
         this.description = " ";
-        this.external_reference = " ";
+        this.external_reference = uuidv4();
         this.items = detalhes_pedido.map(item => ({
             sku_number: (item.produto_id).toString(),
             category: " ",
@@ -66,7 +68,7 @@ class QrCode {
             unit_measure: " ",
             total_amount: (item.preco / 100) * item.quantidade
         }));
-        this.notification_url = "https://webhook-test.com/6244f372b253ff0b4b3b11e24ee80273";
+        this.notification_url = "https://webhook-test.com/d4b4dfdd95ca464d884e67736ddc09ab";
         this.title = "Pedido de Produto";
         this.total_amount = this.calcularTotal(detalhes_pedido);
     }
