@@ -3,7 +3,7 @@ require('dotenv').config();
 
 class MercadoPagoAPI {
     constructor() {
-        this.accessToken = process.env.YOUR_ACCESS_TOKEN;
+        this.accessToken = "TEST-5964076815976378-051520-8a77a9bead5df7df19b07595bfdef256-1795241025";
         this.baseURL = 'https://api.mercadopago.com';
         this.headers = {
             'Content-Type': 'application/json',
@@ -66,10 +66,7 @@ class QrCode {
             unit_measure: " ",
             total_amount: (item.preco / 100) * item.quantidade
         }));
-        this.notification_url = "https://www.seuserver.com/notificacoes";
-        this.sponsor = {
-            id: parseInt(process.env.SPONSOR_ID)
-        };
+        this.notification_url = "https://webhook-test.com/6244f372b253ff0b4b3b11e24ee80273";
         this.title = "Pedido de Produto";
         this.total_amount = this.calcularTotal(detalhes_pedido);
     }
@@ -103,8 +100,3 @@ module.exports = {
     MercadoPagoAPI: new MercadoPagoAPI(),
     QrCode: QrCode
 };
-
-
-// const accessToken = process.env.YOUR_ACCESS_TOKEN;
-// console.log(accessToken);
-

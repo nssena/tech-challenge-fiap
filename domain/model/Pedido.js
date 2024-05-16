@@ -39,6 +39,8 @@ class Pedido {
 
         const resposta = await MercadoPagoAPI.APIPost(apiUrl,dadosQrCode)
 
+        console.log(resposta);
+
         return resposta;
     }
 
