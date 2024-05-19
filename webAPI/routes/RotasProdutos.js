@@ -6,7 +6,7 @@ const rotasProdutos = express();
 //Rota para criar um novo produto
 rotasProdutos.post('/novoproduto', adicionarProduto)
 
-rotasProdutos.put('', editarProduto)
+rotasProdutos.patch('/editarproduto/:id', editarProduto)
 
 rotasProdutos.delete('', excluirProduto)
 

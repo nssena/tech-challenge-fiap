@@ -93,6 +93,10 @@ const finalizarPedido = async (req, res) => {
   }
 };
 
+const listarPedidos = async (req, res) => {
+  
+}
+
 module.exports = {
   fazerPedido,
   finalizarPedido

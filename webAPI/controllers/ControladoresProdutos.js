@@ -12,18 +12,28 @@ const adicionarProduto = async (req, res) => {
         return res.status(200).json({ mensagem: 'Produto adicionado com sucesso.' });
 
     } catch (error) {
-        return res.status(500).json({ mensagem: 'Erro ao adicionar produto: ' + error.message });
+        return res.status(500).json({ mensagem:  error.message });
 
     }
 }
 
 const editarProduto = async (req, res) => {
-    const produto = req.params;
+    const id = Number(req.params.id);
+    const dadosAtualizados = req.body;
+
+    if (isNaN(id)) {
+        return res.status(400).json({ error: 'ID inválido' });
+    }
 
     try {
-        
+        const produto = new Produto(dadosAtualizados);
+        const produtoEditado = await produto.editarProduto(id, dadosAtualizados);
+
+        res.json({ message: 'Produto atualizado com sucesso' });
+
     } catch (error) {
-        
+        return res.status(500).json({ mensagem:  error.message });
+
     }
 }
 
@@ -31,10 +41,14 @@ const excluirProduto = async (req, res) => {
     const produto = req.params;
 
     try {
-        
+
     } catch (error) {
-        
+
     }
+}
+
+const produtosCategoria = async (req, res) => {
+
 }
 
 module.exports = {

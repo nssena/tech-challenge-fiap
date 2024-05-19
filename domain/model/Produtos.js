@@ -34,16 +34,50 @@ class Produto {
             throw new Error(error.message);
         }
     }
-    //método de edição
-    async editarProduto() {
+
+    async editarProduto(id, dadosAtualizados) {
         try {
-            
+            const produtoExistente = await verificarProdutoPorId(id);
+
+            const camposParaAtualizar = {
+                nome_produto: dadosAtualizados.nome_produto || produtoExistente.nome_produto,
+                preco: dadosAtualizados.preco || produtoExistente.preco,
+                categoria_id: dadosAtualizados.categoria_id || produtoExistente.categoria_id,
+                descricao: dadosAtualizados.descricao || produtoExistente.descricao,
+                imagem: dadosAtualizados.imagem || produtoExistente.imagem
+            };
+
+            if (dadosAtualizados.categoria_id) {
+                const categoriaExiste = await verificarCategoriaExistente(camposParaAtualizar.categoria_id);
+
+                console.log(categoriaExiste);
+                if (!categoriaExiste) {
+                    throw new Error('A categoria especificada não existe.');
+                }
+            }
+
+            const queryAtualizarProduto = `
+                UPDATE produtos
+                SET nome_produto = $1, preco = $2, categoria_id = $3, descricao = $4, imagem = $5
+                WHERE id = $6
+            `;
+            await pool.query(queryAtualizarProduto, [
+                camposParaAtualizar.nome_produto,
+                camposParaAtualizar.preco,
+                camposParaAtualizar.categoria_id,
+                camposParaAtualizar.descricao,
+                camposParaAtualizar.imagem,
+                id
+            ]);
+
+            return camposParaAtualizar; 
+
         } catch (error) {
-            
+            throw new Error('Erro ao atualizar o produto: ' + error.message);
+
         }
     }
 
-    //método de remoção
     async excluirProduto() {
 
     }
@@ -76,6 +110,21 @@ async function verificarProdutoCadastrado(nome_produto) {
         return true;
     } catch (error) {
         throw new Error('Erro ao verificar produto cadastrado: ' + error.message);
+    }
+}
+
+async function verificarProdutoPorId(id) {
+    try {
+        const queryVerificarProduto = 'SELECT * FROM produtos WHERE id = $1';
+        const resultVerificarProduto = await pool.query(queryVerificarProduto, [id]);
+
+        if (resultVerificarProduto.rows.length === 0) {
+            throw new Error('Produto não encontrado.');
+        }
+
+        return resultVerificarProduto.rows[0];
+    } catch (error) {
+        throw new Error('Erro ao verificar produto: ' + error.message);
     }
 }
 
