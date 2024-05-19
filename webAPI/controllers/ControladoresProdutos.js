@@ -2,10 +2,10 @@ const Produto = require("../../domain/model/Produtos");
 
 
 const adicionarProduto = async (req, res) => {
-    const { nome_produto, preco, categoria_id, descricao, imagem } = req.body;
+    const { nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo } = req.body;
 
     try {
-        const produto = new Produto(nome_produto, preco, categoria_id, descricao, imagem);
+        const produto = new Produto(nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo);
 
         await produto.adicionarProduto();
 

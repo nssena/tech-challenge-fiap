@@ -80,8 +80,15 @@ const schemaProduto = Joi.object({
     imagem: Joi.string().allow('').uri().max(255).messages({
         'string.uri': 'A URL da imagem não é válida.',
         'string.max': 'A URL da imagem deve ter no máximo {{#limit}} caracteres.'
+    }),
+    tempo_preparo: Joi.number().integer().positive().required().messages({
+        'any.required': 'O tempo de preparo é obrigatório.',
+        'number.base': 'O tempo de preparo deve ser um número inteiro.',
+        'number.integer': 'O tempo de preparo deve ser um número inteiro.',
+        'number.positive': 'O tempo de preparo deve ser um número positivo.'
     })
 })
+
 
 module.exports = {
     schemaCliente,

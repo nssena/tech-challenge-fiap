@@ -2,17 +2,18 @@ const pool = require("../../infrastructure/persistence/Database");
 const { schemaProduto } = require("../validation/schemas");
 
 class Produto {
-    constructor(nome_produto, preco, categoria_id, descricao, imagem) {
+    constructor(nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo) {
         this.nome_produto = nome_produto;
         this.preco = preco;
         this.categoria_id = categoria_id;
         this.descricao = descricao;
         this.imagem = imagem;
+        this.tempo_preparo = tempo_preparo;
     }
 
     async adicionarProduto() {
         try {
-            const { error } = schemaProduto.validate({ nome_produto: this.nome_produto, preco: this.preco, categoria_id: this.categoria_id, descricao: this.descricao, imagem: this.imagem });
+            const { error } = schemaProduto.validate({ nome_produto: this.nome_produto, preco: this.preco, categoria_id: this.categoria_id, descricao: this.descricao, imagem: this.imagem, tempo_preparo: this.tempo_preparo });
             if (error) {
                 throw new Error(error.details[0].message);
             }
@@ -27,8 +28,8 @@ class Produto {
                 throw new Error('Este produto já foi cadastrado anteriormente.');
             }
 
-            const query = 'insert into produtos (nome_produto, preco, categoria_id, descricao, imagem) values ($1, $2, $3, $4, $5)';
-            await pool.query(query, [this.nome_produto, this.preco, this.categoria_id, this.descricao, this.imagem]);
+            const query = 'insert into produtos (nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo) values ($1, $2, $3, $4, $5, $6)';
+            await pool.query(query, [this.nome_produto, this.preco, this.categoria_id, this.descricao, this.imagem, this.tempo_preparo]);
 
         } catch (error) {
             throw new Error(error.message);
