@@ -38,7 +38,7 @@ class Pedido {
         // Inserir pedido na tabela pedidos
 
         const queryPedido = 'INSERT INTO pedidos (cliente_id, preco_total, external_reference) VALUES ($1, $2, $3) RETURNING pedido_id';
-        const pedidoResult = await pool.query(queryPedido, [this.client_id, dadosQrCode.total_amount * 100, dadosQrCode.external_reference]);
+        const pedidoResult = await pool.query(queryPedido, [this.client_id, Math.round(dadosQrCode.total_amount * 100), dadosQrCode.external_reference]);
 
         for (const pedido of this.pedidos) {
             const pedido_id = pedidoResult.rows[0].pedido_id;
@@ -57,11 +57,7 @@ class Pedido {
 
         return resposta;
     }
-
-    async atualizarPedidoPago() {
-        
-    }
 }
 
 
-module.exports = Pedido;
+module.exports = Pedido

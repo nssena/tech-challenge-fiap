@@ -1,6 +1,7 @@
 const QrCode = require("../../domain/model/MercadoPago");
 const Pedido = require("../../domain/model/Pedido");
 const axios = require('axios');
+const pool = require("../../infrastructure/persistence/Database");
 require('dotenv').config();
 
 
@@ -9,7 +10,7 @@ const fazerPedido = async (req, res) => {
   const { cliente_id, detalhes_pedido } = req.body;
 
   try {
-    const pedido = new Pedido(cliente_id);
+    const pedido = new Pedido(cliente_id)
 
     await pedido.adicionarItemPedido(detalhes_pedido);
 
@@ -35,7 +36,9 @@ const finalizarPedido = async (req, res) => {
       if (response.status === 200) {
         const data = response.data;
         const statusPagamento = data.order_status;
-        return statusPagamento;
+        const externalReference = data.external_reference;
+
+        return { statusPagamento, externalReference };
       } else {
         console.error('Erro ao acessar a API');
         return null;
@@ -46,17 +49,39 @@ const finalizarPedido = async (req, res) => {
     }
   };
 
+  //Função para atualizar o pedido para pago no banco
+  const atualizarPedidoPago = async (externalReference) => {
+    try {
+        const queryVerificarPedido = 'SELECT * FROM pedidos WHERE external_reference = $1';
+        const { rows } = await pool.query(queryVerificarPedido, [externalReference]);
+
+        if (rows.length === 0) {
+            throw new Error('Pedido não encontrado');
+        }
+
+        const queryAtualizarPedido = 'UPDATE pedidos SET status = true WHERE external_reference = $1';
+        await pool.query(queryAtualizarPedido, [externalReference]);
+
+        return 'Pedido atualizado com sucesso';
+    } catch (error) {
+        throw new Error('Erro ao atualizar pedido: ' + error.message);
+    }
+};
+
   // processar pedido
   try {
     const { resource } = req.body;
+
     const orderId = resource.split('/').pop();
     const accessToken = "TEST-5964076815976378-051520-8a77a9bead5df7df19b07595bfdef256-1795241025";
 
-    const statusPagamento = await checarStatusPagamento(orderId, accessToken);
+    const { statusPagamento, externalReference }= await checarStatusPagamento(orderId, accessToken);
 
     if (statusPagamento === 'paid') {
       console.log('Pedido pago!');
-      // Coloque aqui o código para atualizar no banco de dados que o pedido foi pago
+      const mensagemAtualizacao = await atualizarPedidoPago(externalReference)
+      console.log(mensagemAtualizacao);
+
     } else {
       console.log('Pedido ainda não pago.');
     }
