@@ -45,7 +45,8 @@ class Produto {
                 preco: dadosAtualizados.preco || produtoExistente.preco,
                 categoria_id: dadosAtualizados.categoria_id || produtoExistente.categoria_id,
                 descricao: dadosAtualizados.descricao || produtoExistente.descricao,
-                imagem: dadosAtualizados.imagem || produtoExistente.imagem
+                imagem: dadosAtualizados.imagem || produtoExistente.imagem,
+                tempo_preparo: dadosAtualizados.tempo_preparo || produtoExistente.tempo_preparo
             };
 
             if (dadosAtualizados.categoria_id) {
@@ -59,8 +60,8 @@ class Produto {
 
             const queryAtualizarProduto = `
                 UPDATE produtos
-                SET nome_produto = $1, preco = $2, categoria_id = $3, descricao = $4, imagem = $5
-                WHERE id = $6
+                SET nome_produto = $1, preco = $2, categoria_id = $3, descricao = $4, imagem = $5, tempo_preparo = $6
+                WHERE id = $7
             `;
             await pool.query(queryAtualizarProduto, [
                 camposParaAtualizar.nome_produto,
@@ -68,6 +69,7 @@ class Produto {
                 camposParaAtualizar.categoria_id,
                 camposParaAtualizar.descricao,
                 camposParaAtualizar.imagem,
+                camposParaAtualizar.tempo_preparo,
                 id
             ]);
 
