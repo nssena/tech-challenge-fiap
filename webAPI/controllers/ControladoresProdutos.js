@@ -38,14 +38,22 @@ const editarProduto = async (req, res) => {
 }
 
 const excluirProduto = async (req, res) => {
-    const produto = req.params;
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+        return res.status(400).json({ error: 'ID inválido' });
+    }
 
     try {
-
+        const produto = new Produto();
+        await produto.excluirProduto(id);
+        res.status(200).json({ message: 'Produto excluído com sucesso' });
     } catch (error) {
-
+        res.status(500).json({ error: error.message });
     }
 }
+
+
 
 const produtosCategoria = async (req, res) => {
 

@@ -8,6 +8,6 @@ rotasProdutos.post('/novoproduto', adicionarProduto)
 
 rotasProdutos.patch('/editarproduto/:id', editarProduto)
 
-rotasProdutos.delete('', excluirProduto)
+rotasProdutos.delete('/excluirproduto/:id', excluirProduto)
 
 module.exports = rotasProdutos

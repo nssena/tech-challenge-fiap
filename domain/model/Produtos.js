@@ -73,7 +73,7 @@ class Produto {
                 id
             ]);
 
-            return camposParaAtualizar; 
+            return camposParaAtualizar;
 
         } catch (error) {
             throw new Error('Erro ao atualizar o produto: ' + error.message);
@@ -81,8 +81,16 @@ class Produto {
         }
     }
 
-    async excluirProduto() {
+    async excluirProduto(id) {
+        try {
+            const produtoExistente = await verificarProdutoPorId(id);
 
+            const queryDeletarProduto = `DELETE FROM produtos WHERE id = $1`;
+            await pool.query(queryDeletarProduto, [id])
+
+        } catch (error) {
+            throw new Error('Erro ao excluir o produto: ' + error.message);
+        }
     }
 }
 
