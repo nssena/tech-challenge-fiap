@@ -55,12 +55,22 @@ const excluirProduto = async (req, res) => {
 
 
 
-const produtosCategoria = async (req, res) => {
+const listarProdutosCategoria = async (req, res) => {
+    const categoriaId = req.params.categoria_id;
 
+    try {
+        const produto = new Produto();
+        const produtosPorCategoria = await produto.listarProdutosPorCategoria(categoriaId);
+
+        res.status(200).json(produtosPorCategoria);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
 
 module.exports = {
     adicionarProduto,
     editarProduto,
-    excluirProduto
+    excluirProduto,
+    listarProdutosCategoria
 }

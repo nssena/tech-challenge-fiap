@@ -92,6 +92,17 @@ class Produto {
             throw new Error('Erro ao excluir o produto: ' + error.message);
         }
     }
+
+    async listarProdutosPorCategoria(categoriaId) {
+        try {
+            const queryListarProdutos = 'SELECT * FROM produtos WHERE categoria_id = $1';
+            const resultado = await pool.query(queryListarProdutos, [categoriaId]);
+
+            return resultado.rows;
+        } catch (error) {
+            throw new Error('Erro ao listar produtos por categoria: ' + error.message);
+        }
+    }
 }
 
 async function verificarCategoriaExistente(categoria_id) {
