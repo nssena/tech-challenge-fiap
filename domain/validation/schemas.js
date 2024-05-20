@@ -81,11 +81,11 @@ const schemaProduto = Joi.object({
         'string.uri': 'A URL da imagem não é válida.',
         'string.max': 'A URL da imagem deve ter no máximo {{#limit}} caracteres.'
     }),
-    tempo_preparo: Joi.number().integer().positive().required().messages({
+    tempo_preparo: Joi.number().integer().min(0).required().messages({
         'any.required': 'O tempo de preparo é obrigatório.',
         'number.base': 'O tempo de preparo deve ser um número inteiro.',
         'number.integer': 'O tempo de preparo deve ser um número inteiro.',
-        'number.positive': 'O tempo de preparo deve ser um número positivo.'
+        'number.min': 'O tempo de preparo deve ser igual ou maior que zero.'
     })
 })
 

@@ -1,5 +1,5 @@
 const express = require('express');
-const { fazerPedido, finalizarPedido } = require('../controllers/ControladoresPedido');
+const { fazerPedido, finalizarPedido, listarPedidos, statusTempoEstimado } = require('../controllers/ControladoresPedido');
 
 const rotasPedido = express();
 
@@ -9,8 +9,11 @@ module.exports = rotasPedido;
 
 rotasPedido.post('/novopedido', fazerPedido)
 
-//Rota de pagamento
-
 //Rota para finalizar um pedido
 
 rotasPedido.post('/finalizarpedido', finalizarPedido)
+
+//Listar pedidos feitos
+
+rotasPedido.get('/listarPedidos', listarPedidos);
+

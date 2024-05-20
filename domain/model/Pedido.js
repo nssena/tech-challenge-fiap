@@ -8,6 +8,7 @@ class Pedido {
         this.client_id = client_id;
         this.pedidos = [];
         this.pedidosEnviados = [];
+        this.tempoEstimadoEntrega = 0;
     }
 
     async adicionarItemPedido(detalhes_pedido) {
@@ -22,6 +23,18 @@ class Pedido {
                 } else {
                     this.pedidos.push(itemPedido);
                 }
+
+                //Tempo de preparo do pedido
+
+                const queryProduto = 'SELECT tempo_preparo FROM produtos WHERE id = $1';
+                const produtoResult = await pool.query(queryProduto, [itemPedido.produto_id]);
+
+                if (produtoResult.rows.length === 0) {
+                    throw new Error('Produto não encontrado');
+                }
+
+                const tempoPreparo = produtoResult.rows[0].tempo_preparo;
+                this.tempoEstimadoEntrega = Math.max(this.tempoEstimadoEntrega, tempoPreparo);
             }
 
         } catch (error) {
@@ -35,10 +48,11 @@ class Pedido {
 
         const dadosQrCode = new QrCode(detalhes_pedido);
         const qrCodeJSON = dadosQrCode.toJSON();
+
         // Inserir pedido na tabela pedidos
 
-        const queryPedido = 'INSERT INTO pedidos (cliente_id, preco_total, external_reference) VALUES ($1, $2, $3) RETURNING pedido_id';
-        const pedidoResult = await pool.query(queryPedido, [this.client_id, qrCodeJSON.total_amount * 100, qrCodeJSON.external_reference]);
+        const queryPedido = 'INSERT INTO pedidos (cliente_id, preco_total, external_reference, tempo_estimado_entrega) VALUES ($1, $2, $3, $4) RETURNING pedido_id';
+        const pedidoResult = await pool.query(queryPedido, [this.client_id, qrCodeJSON.total_amount * 100, qrCodeJSON.external_reference, this.tempoEstimadoEntrega]);
 
         const pedido_id = pedidoResult.rows[0].pedido_id;
 
@@ -46,7 +60,6 @@ class Pedido {
             const queryNomeProduto = 'SELECT nome_produto FROM produtos WHERE id = $1';
             const nomeProdutoResult = await pool.query(queryNomeProduto, [detalhe_pedido.produto_id]);
             const nome_produto = nomeProdutoResult.rows[0].nome_produto;
-            console.log(nome_produto);
 
             // Inserir detalhes do pedido na tabela pedido_detalhado
             const queryDetalhesPedido = 'INSERT INTO pedido_detalhado (pedido_id, nome_produto, preco, quantidade) VALUES ($1, $2, $3, $4)';

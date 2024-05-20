@@ -68,7 +68,7 @@ class QrCode {
             unit_measure: " ",
             total_amount: (item.preco / 100) * item.quantidade
         }));
-        this.notification_url = "https://webhook-test.com/c13669fe38ce8fe80fb0ab55eb24881a";
+        this.notification_url = "https://webhook-test.com/1fbfafc5da5b0707bd4f43569fad0305";
         this.title = "Pedido de Produto";
         this.total_amount = this.calcularTotal(detalhes_pedido);
     }

@@ -52,21 +52,21 @@ const finalizarPedido = async (req, res) => {
   //Função para atualizar o pedido para pago no banco
   const atualizarPedidoPago = async (externalReference) => {
     try {
-        const queryVerificarPedido = 'SELECT * FROM pedidos WHERE external_reference = $1';
-        const { rows } = await pool.query(queryVerificarPedido, [externalReference]);
+      const queryVerificarPedido = 'SELECT * FROM pedidos WHERE external_reference = $1';
+      const { rows } = await pool.query(queryVerificarPedido, [externalReference]);
 
-        if (rows.length === 0) {
-            throw new Error('Pedido não encontrado');
-        }
+      if (rows.length === 0) {
+        throw new Error('Pedido não encontrado');
+      }
 
-        const queryAtualizarPedido = 'UPDATE pedidos SET status = true WHERE external_reference = $1';
-        await pool.query(queryAtualizarPedido, [externalReference]);
+      const queryAtualizarPedido = 'UPDATE pedidos SET pagamento = true WHERE external_reference = $1';
+      await pool.query(queryAtualizarPedido, [externalReference]);
 
-        return 'Pedido atualizado com sucesso';
+      return 'Pedido atualizado com sucesso';
     } catch (error) {
-        throw new Error('Erro ao atualizar pedido: ' + error.message);
+      throw new Error('Erro ao atualizar pedido: ' + error.message);
     }
-};
+  };
 
   // processar pedido
   try {
@@ -75,12 +75,10 @@ const finalizarPedido = async (req, res) => {
     const orderId = resource.split('/').pop();
     const accessToken = "TEST-5964076815976378-051520-8a77a9bead5df7df19b07595bfdef256-1795241025";
 
-    const { statusPagamento, externalReference }= await checarStatusPagamento(orderId, accessToken);
+    const { statusPagamento, externalReference } = await checarStatusPagamento(orderId, accessToken);
 
     if (statusPagamento === 'paid') {
-      console.log('Pedido pago!');
-      const mensagemAtualizacao = await atualizarPedidoPago(externalReference)
-      console.log(mensagemAtualizacao);
+      await atualizarPedidoPago(externalReference)
 
     } else {
       console.log('Pedido ainda não pago.');
@@ -94,10 +92,27 @@ const finalizarPedido = async (req, res) => {
 };
 
 const listarPedidos = async (req, res) => {
-  
+  try {
+    const queryListarPedidos = `
+      SELECT pedido_id, tempo_estimado_entrega, status_pedido
+      FROM pedidos
+      WHERE pagamento = true
+    `;
+    const { rows } = await pool.query(queryListarPedidos);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ mensagem: "Nenhum pedido encontrado" });
+    }
+
+    return res.status(200).json(rows);
+  } catch (error) {
+    console.error("Erro ao listar pedidos:", error);
+    return res.status(500).json({ mensagem: "Erro ao listar pedidos: " + error.message });
+  }
 }
 
 module.exports = {
   fazerPedido,
-  finalizarPedido
+  finalizarPedido,
+  listarPedidos
 }
