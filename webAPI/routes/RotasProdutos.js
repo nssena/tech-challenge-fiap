@@ -4,6 +4,8 @@ const { adicionarProduto, editarProduto, excluirProduto, listarProdutosCategoria
 const rotasProdutos = express();
 
 //Rota para criar um novo produto
+
+//Criar autenticador para rotas de produto
 rotasProdutos.post('/novoproduto', adicionarProduto)
 
 rotasProdutos.patch('/editarproduto/:id', editarProduto)
