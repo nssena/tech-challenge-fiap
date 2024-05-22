@@ -91,6 +91,11 @@
                 "tags": [
                     "Produtos"
                 ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -255,6 +260,13 @@
                     "categoria_id",
                     "tempo_preparo"
                 ]
+            }
+        },
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "authorization"
             }
         }
     }
