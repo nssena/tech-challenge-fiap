@@ -1,13 +1,13 @@
 {
     "openapi": "3.0.0",
     "info": {
-      "title": "API de vendas em lanchonete/restaurante com pagamento via QR Code do Mercado Pago",
-      "description": "**Com essa API, você tem total controle sobre os pedidos e produtos do seu negócio!**\n\n**Funcionalidades:**\n\n* **Gerenciamento de Clientes:**\n    * Cadastro de clientes (ou identificação de clientes já cadastrados)\n* **Gerenciamento de Pedidos:**\n    * Realização de pedidos, inclusive anônimos\n    * Pagamento via QR Code do Mercado Pago\n    * Notificações de pagamento em tempo real\n    * Acompanhamento do tempo estimado de entrega e status do pedido\n* **Gerenciamento de Produtos:**\n    * Cadastro de novos produtos\n    * Edição de informações de produtos\n    * Exclusão de produtos\n\n**Ideal para:**\n\n* Lanchonetes e restaurantes que desejam modernizar seus processos de venda\n* Empresas que buscam aumentar a eficiência e a satisfação dos seus clientes\n* Empreendedores que querem oferecer uma experiência de compra inovadora e segura\n\n**Comece a usar agora mesmo e eleve suas vendas para o próximo nível!**",
-      "termsOfService": "",
-      "contact": {
-        "email": "nataliasenasantos@gmail.com"
-      },
-      "version": "1.0.0"
+        "title": "API de vendas em lanchonete/restaurante com pagamento via QR Code do Mercado Pago",
+        "description": "**Com essa API, você tem total controle sobre os pedidos e produtos do seu negócio!**\n\n**Funcionalidades:**\n\n* **Gerenciamento de Clientes:**\n    * Cadastro de clientes (ou identificação de clientes já cadastrados)\n* **Gerenciamento de Pedidos:**\n    * Realização de pedidos, inclusive anônimos\n    * Pagamento via QR Code do Mercado Pago\n    * Notificações de pagamento em tempo real\n    * Acompanhamento do tempo estimado de entrega e status do pedido\n* **Gerenciamento de Produtos:**\n    * Cadastro de novos produtos\n    * Edição de informações de produtos\n    * Exclusão de produtos\n\n**Ideal para:**\n\n* Lanchonetes e restaurantes que desejam modernizar seus processos de venda\n* Empresas que buscam aumentar a eficiência e a satisfação dos seus clientes\n* Empreendedores que querem oferecer uma experiência de compra inovadora e segura\n\n**Comece a usar agora mesmo e eleve suas vendas para o próximo nível!**",
+        "termsOfService": "",
+        "contact": {
+            "email": "nataliasenasantos@gmail.com"
+        },
+        "version": "1.0.0"
     },
     "servers": [
         {
@@ -20,18 +20,20 @@
             "post": {
                 "sumary": "Cadastro de cliente",
                 "description": "Essa rota permite cadastrar um novo cliente na base de dados",
-                "tags": ["Clientes"],
+                "tags": [
+                    "Clientes"
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Clientes"
+                                "$ref": "#/components/schemas/Cliente"
                             },
                             "examples": {
                                 "cliente": {
                                     "value": {
-                                        "nome": "Ana Maria Braga",
-                                        "email": "anamariabraga@email.com",
+                                        "nome": "Usuário teste",
+                                        "email": "teste@email.com",
                                         "cpf": "12345678912"
                                     }
                                 }
@@ -48,25 +50,96 @@
                     }
                 }
             }
-        }
-    },
-    "components": {
-        "schemas": {
-            "Clientes": {
-                "type": "object",
-                "properties": {
-                    "nome": {
-                        "type": "string"
+        },
+        "/cliente": {
+            "post": {
+                "sumary": "Identificação de cliente",
+                "description": "Permite identificar o cliente através do cpf cadastrado no sistema",
+                "tags": [
+                    "Clientes"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CPF"
+                            },
+                            "examples": {
+                                "cliente": {
+                                    "value": {
+                                        "cpf": "12345678912"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cliente já cadastrado"
                     },
-                    "email": {
-                        "type": "string"
-                    },
-                    "cpf": {
-                        "type": "string"
+                    "404": {
+                        "description": "Cliente não encontrado"
                     }
                 }
             }
         }
-    }
-  }
-  
+    },
+    "components": {
+        "schemas": {
+          "Cliente": {
+            "type": "object",
+            "properties": {
+              "nome": {
+                "type": "string",
+                "description": "Nome do cliente (máximo 50 caracteres)",
+                "required": true,
+                "messages": {
+                  "string.base": "O nome do cliente deve ser uma string",
+                  "string.max": "O nome do cliente deve ter no máximo {#limit} caracteres",
+                  "any.required": "O nome do cliente é obrigatório"
+                }
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "Email do cliente (máximo 100 caracteres)",
+                "required": true,
+                "messages": {
+                  "string.email": "O email fornecido é inválido",
+                  "string.max": "O email do cliente deve ter no máximo {#limit} caracteres",
+                  "any.required": "O email do cliente é obrigatório"
+                }
+              },
+              "cpf": {
+                "type": "string",
+                "pattern": "^[0-9]+$",
+                "description": "CPF do cliente (11 dígitos)",
+                "required": true,
+                "messages": {
+                  "string.length": "O CPF do cliente deve ter 11 dígitos",
+                  "string.pattern.base": "O CPF do cliente deve conter apenas números",
+                  "any.required": "O CPF do cliente é obrigatório"
+                }
+              }
+            }
+          },
+          "CPF": {
+            "type": "object",
+            "properties": {
+              "cpf": {
+                "type": "string",
+                "pattern": "^[0-9]+$",
+                "description": "CPF do cliente (11 dígitos)",
+                "required": true,
+                "messages": {
+                  "string.length": "O CPF do cliente deve ter 11 dígitos",
+                  "string.pattern.base": "O CPF do cliente deve conter apenas números",
+                  "any.required": "O CPF do cliente é obrigatório"
+                }
+              }
+            }
+          }
+        }
+      }
+}
