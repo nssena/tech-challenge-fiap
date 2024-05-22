@@ -1,10 +1,10 @@
 const Produto = require("../../domain/model/Produtos");
 
+//Token para validar as rotas
 const tokenAutenticacao = 'admin';
 
 const usuarioAutenticado = async (req, res, next) => {
     const token = req.headers['authorization'];
-    console.log(req.headers);
     if (token && token === tokenAutenticacao) {
         return next();
     }

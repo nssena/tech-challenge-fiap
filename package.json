@@ -4,7 +4,8 @@
   "description": "Projeto do Tech Challeng da Pós de Arquitetura de Software da FIAP",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon ./config/server.js"
+    "dev": "nodemon ./config/server.js",
+    "test": "jest"
   },
   "author": "Natália Sena",
   "license": "MIT",
