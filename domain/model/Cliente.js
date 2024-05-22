@@ -28,15 +28,13 @@ class Cliente {
                 throw new Error("Cliente já cadastrado");
             }
 
-            //tratar o erro dessa requisição
             const query = 'insert into clientes (nome, email, cpf) values ($1, $2, $3)';
             const novoClienteCadastrado = await pool.query(query, [this.nome, this.email, this.cpf]);
 
-
-            if (novoClienteCadastrado.rowCount > 0) {
+            if (novoClienteCadastrado.rowCount === 1) {
                 return true;
             } else {
-                return false;
+                throw new Error("Erro ao cadastrar cliente");
             }
 
         } catch (error) {

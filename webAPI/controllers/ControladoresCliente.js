@@ -10,14 +10,12 @@ const cadastrarCliente = async (req, res) => {
     try {
         const cliente = new Cliente(nome, email, cpf);
         const resultadoCadastro = await cliente.cadastrar();
-        
-
+    
         if (resultadoCadastro === true) {
             const token = cliente.gerarToken();
             res.cookie('token', token, { httpOnly: true });
             res.status(201).json({ mensagem: "Cliente cadastrado com sucesso" });
             
-            // redirecionar para a página de pedidos ou apresentar um botão para a pessoa iniciar o pedido com o link da página de produtos
 
         } else {
             return res.status(400).json({ mensagem: resultadoCadastro.error });
