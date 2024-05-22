@@ -1,4 +1,5 @@
 const Produto = require("../../domain/model/Produtos");
+const { ValidationError, NotFoundError, ConflictError } = require("../../domain/validation/validationError");
 
 //Token para validar as rotas
 const tokenAutenticacao = 'admin';
@@ -18,13 +19,27 @@ const adicionarProduto = async (req, res) => {
     try {
         const produto = new Produto(nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo);
 
-        await produto.adicionarProduto();
+        console.log(produto);
 
-        return res.status(200).json({ mensagem: 'Produto adicionado com sucesso.' });
+        const adicionarProduto = await produto.adicionarProduto();
+
+        console.log(adicionarProduto);
+
+        return res.status(200).json({ mensagem: adicionarProduto.message });
 
     } catch (error) {
-        return res.status(500).json({ mensagem:  error.message });
+        if (error instanceof ValidationError) {
+            return res.status(400).json({ mensagem: error.message});
+        }
+        if (error instanceof NotFoundError) {
+            return res.status(404).json({ mensagem: error.message});
+        }
 
+        if (error instanceof ConflictError) {
+            return res.status(409).json({ mensagem: error.message});
+        }
+
+        return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
     }
 }
 

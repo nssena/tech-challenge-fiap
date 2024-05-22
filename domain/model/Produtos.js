@@ -1,5 +1,6 @@
 const pool = require("../../infrastructure/persistence/Database");
 const { schemaProduto } = require("../validation/schemas");
+const { NotFoundError, ConflictError, ValidationError } = require("../validation/validationError");
 
 class Produto {
     constructor(nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo) {
@@ -14,25 +15,28 @@ class Produto {
     async adicionarProduto() {
         try {
             const { error } = schemaProduto.validate({ nome_produto: this.nome_produto, preco: this.preco, categoria_id: this.categoria_id, descricao: this.descricao, imagem: this.imagem, tempo_preparo: this.tempo_preparo });
+
             if (error) {
-                throw new Error(error.details[0].message);
+                throw new ValidationError(error.details[0].message);
             }
 
             const categoriaExiste = await verificarCategoriaExistente(this.categoria_id);
             if (!categoriaExiste) {
-                throw new Error('A categoria especificada não existe.');
+                throw new NotFoundError('A categoria especificada não existe.');
             }
 
             const produtoCadastrado = await verificarProdutoCadastrado(this.nome_produto);
             if (produtoCadastrado) {
-                throw new Error('Este produto já foi cadastrado anteriormente.');
+                throw new ConflictError('Este produto já foi cadastrado anteriormente.');
             }
 
             const query = 'insert into produtos (nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo) values ($1, $2, $3, $4, $5, $6)';
             await pool.query(query, [this.nome_produto, this.preco, this.categoria_id, this.descricao, this.imagem, this.tempo_preparo]);
 
+            return { success: true, message: 'Produto adicionado com sucesso.' };
+
         } catch (error) {
-            throw new Error(error.message);
+            throw error
         }
     }
 
