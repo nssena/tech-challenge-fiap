@@ -1,16 +1,15 @@
 const express = require('express');
-const { adicionarProduto, editarProduto, excluirProduto, listarProdutosCategoria } = require('../controllers/ControladoresProdutos');
+const { adicionarProduto, editarProduto, excluirProduto, listarProdutosCategoria, usuarioAutenticado } = require('../controllers/ControladoresProdutos');
 
 const rotasProdutos = express();
 
-//Rota para criar um novo produto
 
 //Criar autenticador para rotas de produto
-rotasProdutos.post('/novoproduto', adicionarProduto)
+rotasProdutos.post('/novoproduto', usuarioAutenticado, adicionarProduto)
 
-rotasProdutos.patch('/editarproduto/:id', editarProduto)
+rotasProdutos.patch('/editarproduto/:id', usuarioAutenticado, editarProduto)
 
-rotasProdutos.delete('/excluirproduto/:id', excluirProduto)
+rotasProdutos.delete('/excluirproduto/:id', usuarioAutenticado, excluirProduto)
 
 rotasProdutos.get('/produtos/categoria/:categoria_id', listarProdutosCategoria)
 

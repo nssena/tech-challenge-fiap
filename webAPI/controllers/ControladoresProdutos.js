@@ -1,5 +1,16 @@
 const Produto = require("../../domain/model/Produtos");
 
+const tokenAutenticacao = 'admin';
+
+const usuarioAutenticado = async (req, res, next) => {
+    const token = req.headers['authorization'];
+    console.log(req.headers);
+    if (token && token === tokenAutenticacao) {
+        return next();
+    }
+    res.status(401).json({ message: 'Você precisa estar autenticado para acessar esta rota' });
+}
+
 
 const adicionarProduto = async (req, res) => {
     const { nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo } = req.body;
@@ -69,6 +80,7 @@ const listarProdutosCategoria = async (req, res) => {
 }
 
 module.exports = {
+    usuarioAutenticado,
     adicionarProduto,
     editarProduto,
     excluirProduto,
