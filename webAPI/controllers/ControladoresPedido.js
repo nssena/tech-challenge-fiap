@@ -2,6 +2,7 @@ const QrCode = require("../../domain/model/MercadoPago");
 const Pedido = require("../../domain/model/Pedido");
 const axios = require('axios');
 const pool = require("../../infrastructure/persistence/Database");
+const { ValidationError, NotFoundError } = require("../../domain/validation/validationError");
 require('dotenv').config();
 
 
@@ -18,7 +19,14 @@ const fazerPedido = async (req, res) => {
 
     return res.status(200).json({ mensagem: "Pedido feito com sucesso.", qrCode: qrCode.qr_data });
   } catch (error) {
-    return res.status(500).json({ mensagem: "Erro interno do servidor: " + error.message });
+    if (error instanceof ValidationError) {
+      return res.status(400).json({ mensagem: error.message });
+    }
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({ mensagem: error.message });
+    }
+
+    return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
   }
 }
 

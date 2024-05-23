@@ -13,6 +13,8 @@ class Pedido {
 
     async adicionarItemPedido(detalhes_pedido) {
         try {
+
+            //Preciso validar se o id existe e caso esteja em branco deixra passar
             await schemaDetalhesPedido.validateAsync(detalhes_pedido);
 
             for (const itemPedido of detalhes_pedido) {
@@ -30,7 +32,7 @@ class Pedido {
                 const produtoResult = await pool.query(queryProduto, [itemPedido.produto_id]);
 
                 if (produtoResult.rows.length === 0) {
-                    throw new Error('Produto não encontrado');
+                    throw new NotFoundError('Produto não encontrado');
                 }
 
                 const tempoPreparo = produtoResult.rows[0].tempo_preparo;

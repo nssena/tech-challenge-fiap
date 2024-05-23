@@ -363,6 +363,65 @@
                     }
                 }
             }
+        },
+        "/novopedido": {
+            "post": {
+                "sumary": "Novo pedido",
+                "description": "Rota para realizar um novo pedido.",
+                "tags": [
+                    "Pedidos"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NovoPedido"
+                            },
+                            "examples": {
+                                "pedido": {
+                                    "value": {
+                                        "cliente_id": 2,
+                                        "detalhes_pedido": [
+                                            {
+                                                "produto_id": 2,
+                                                "preco": 1599,
+                                                "quantidade": 1
+                                            },
+                                            {
+                                                "produto_id": 3,
+                                                "preco": 599,
+                                                "quantidade": 2
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pedido realizado com sucesso.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Pedido feito com sucesso."
+                                        },
+                                        "qrCode": {
+                                            "type": "string",
+                                            "example": "00020101021243650016COM.MERCADOLIBRE020130636850d04f8-68ae-4203-83bd-a95418a62a415204000053039865802BR5909Test Test6009SAO PAULO62070503***630434EE"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -490,6 +549,48 @@
                     "preco",
                     "categoria_id",
                     "tempo_preparo"
+                ]
+            },
+            "NovoPedido": {
+                "type": "object",
+                "properties": {
+                    "cliente_id": {
+                        "type": "integer",
+                        "description": "ID do cliente que está fazendo o pedido",
+                        "example": 2
+                    },
+                    "detalhes_pedido": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "produto_id": {
+                                    "type": "integer",
+                                    "description": "ID do produto a ser adicionado ao pedido",
+                                    "example": 2
+                                },
+                                "preco": {
+                                    "type": "integer",
+                                    "description": "Preço unitário do produto em centavos",
+                                    "example": 1599
+                                },
+                                "quantidade": {
+                                    "type": "integer",
+                                    "description": "Quantidade do produto a ser adicionada ao pedido",
+                                    "example": 1
+                                }
+                            },
+                            "required": [
+                                "produto_id",
+                                "preco",
+                                "quantidade"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "cliente_id",
+                    "detalhes_pedido"
                 ]
             }
         },
