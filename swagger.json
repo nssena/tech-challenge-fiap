@@ -16,7 +16,7 @@
         }
     ],
     "paths": {
-        "/novocliente": {
+        "/cadastrar": {
             "post": {
                 "sumary": "Cadastro de cliente",
                 "description": "Essa rota permite cadastrar um novo cliente na base de dados",
@@ -51,7 +51,7 @@
                 }
             }
         },
-        "/cliente": {
+        "/identificar": {
             "post": {
                 "sumary": "Identificação de cliente",
                 "description": "Permite identificar o cliente através do cpf cadastrado no sistema",
@@ -84,7 +84,62 @@
                 }
             }
         },
-        "/novoproduto": {
+        "/listarclientes": {
+            "get": {
+                "sumary": "Listar todos os clientes",
+                "description": "Rota para ver todos os clientes cadastrados no banco de dados",
+                "tags": [
+                    "Clientes"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "cliente_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "nome": {
+                                                "type": "string",
+                                                "example": "Usuário teste"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "teste@email.com"
+                                            },
+                                            "cpf": {
+                                                "type": "string",
+                                                "example": "12345678910"
+                                            },
+                                            "criado_em": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2024-05-05T17:51:55.178Z"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor"
+                    }
+                }
+            }
+        },
+        "/cadastrarproduto": {
             "post": {
                 "sumary": "Cadastro de produto",
                 "description": "Rota para cadastrar um novo produto na base de dados",
@@ -235,7 +290,7 @@
                 }
             }
         },
-        "/produtos/categoria/{categoria_id}": {
+        "/categoria/{categoria_id}": {
             "get": {
                 "sumary": "Listar produtos por categoria",
                 "description": "Rota para listar produtos de acordo com a categoria cadastrada.",

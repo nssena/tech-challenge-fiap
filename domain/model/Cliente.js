@@ -79,6 +79,16 @@ class Cliente {
         const token = jwt.sign({ cpf: this.cpf }, chaveSecreta);
         return token;
     }
+
+    static async listarTodos() {
+        try {
+            const queryListarTodos = 'SELECT * FROM clientes';
+            const resultado = await pool.query(queryListarTodos);
+            return resultado.rows;
+        } catch (error) {
+            throw new Error('Erro ao listar clientes: ' + error.message);
+        }
+    }
 }
 
 module.exports = Cliente;
