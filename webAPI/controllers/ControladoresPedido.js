@@ -99,6 +99,44 @@ const finalizarPedido = async (req, res) => {
   }
 };
 
+const mudarStatusPedidoParaProntoEntrega = async (req, res) => {
+  const { pedido_id } = req.params;
+
+  try {
+    const pedido = await pool.query('SELECT * FROM pedidos WHERE pedido_id = $1', [pedido_id]);
+    if (pedido.rowCount === 0) {
+      throw new NotFoundError('Pedido não encontrado.');
+    }
+
+    await pool.query('UPDATE pedidos SET status_pedido = $1 WHERE pedido_id = $2', ['pronto para entrega', pedido_id]);
+
+    res.status(200).json({ mensagem: 'Status do pedido atualizado para pronto para entrega.' });
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      res.status(error.statusCode).json({ mensagem: error.message });
+    } else {
+      console.error('Erro ao mudar o status do pedido para pronto para entrega:', error);
+      res.status(500).json({ mensagem: 'Erro interno ao mudar o status do pedido para pronto para entrega.' });
+    }
+  }
+};
+
+
+const cadastrarTelefone = async (req, res) => {
+  const { cliente_id, telefone } = req.body
+  //pop-up para incluir número de telefone e receber a notificação
+  try {
+    const queryAdicionarTelefone = 'INSERT INTO clientes (telefone) values $1 WHERE cliente_id = $2';
+    const novoTelefoneCadastrado = await pool.query(queryAdicionarTelefone, [telefone, cliente_id])
+
+    if (novoTelefoneCadastrado.rowCount > 0) {
+      res.status(200).send('Telefone cadastrado com sucesso, aguarde a notificação através deste número.');
+    }
+  } catch (error) {
+    res.status(500).send('Erro interno ao processar a notificação.');
+  }
+}
+
 const listarPedidos = async (req, res) => {
   try {
     const queryListarPedidos = `
@@ -125,5 +163,7 @@ const listarPedidos = async (req, res) => {
 module.exports = {
   fazerPedido,
   finalizarPedido,
+  mudarStatusPedidoParaProntoEntrega,
+  cadastrarTelefone,
   listarPedidos
 }

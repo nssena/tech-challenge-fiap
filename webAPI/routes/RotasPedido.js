@@ -1,5 +1,5 @@
 const express = require('express');
-const { fazerPedido, finalizarPedido, listarPedidos, statusTempoEstimado } = require('../controllers/ControladoresPedido');
+const { fazerPedido, finalizarPedido, listarPedidos, cadastrarTelefone, mudarStatusPedidoParaProntoEntrega } = require('../controllers/ControladoresPedido');
 
 const rotasPedido = express();
 
@@ -13,6 +13,14 @@ rotasPedido.post('/novopedido', fazerPedido)
 
 rotasPedido.post('/finalizarpedido', finalizarPedido)
 
+//Cadastrar telefone para notificação
+
+rotasPedido.post('/cadastrarTelefone', cadastrarTelefone)
+
 //Listar pedidos feitos
 
 rotasPedido.get('/listarPedidos', listarPedidos);
+
+//Atualizar o status do pedido para pronto para entrega
+
+rotasPedido.post('/prontoparaentrega', mudarStatusPedidoParaProntoEntrega)
