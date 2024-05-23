@@ -19,8 +19,6 @@ const adicionarProduto = async (req, res) => {
     try {
         const produto = new Produto(nome_produto, preco, categoria_id, descricao, imagem, tempo_preparo);
 
-        console.log(produto);
-
         const adicionarProduto = await produto.adicionarProduto();
 
         console.log(adicionarProduto);
@@ -29,14 +27,14 @@ const adicionarProduto = async (req, res) => {
 
     } catch (error) {
         if (error instanceof ValidationError) {
-            return res.status(400).json({ mensagem: error.message});
+            return res.status(400).json({ mensagem: error.message });
         }
         if (error instanceof NotFoundError) {
-            return res.status(404).json({ mensagem: error.message});
+            return res.status(404).json({ mensagem: error.message });
         }
 
         if (error instanceof ConflictError) {
-            return res.status(409).json({ mensagem: error.message});
+            return res.status(409).json({ mensagem: error.message });
         }
 
         return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
@@ -48,17 +46,25 @@ const editarProduto = async (req, res) => {
     const dadosAtualizados = req.body;
 
     if (isNaN(id)) {
-        return res.status(400).json({ error: 'ID inválido' });
+        throw new ValidationError('ID inválido');
     }
 
     try {
         const produto = new Produto(dadosAtualizados);
-        const produtoEditado = await produto.editarProduto(id, dadosAtualizados);
+        const resultado = await produto.editarProduto(id, dadosAtualizados);
 
         res.json({ message: 'Produto atualizado com sucesso' });
 
     } catch (error) {
-        return res.status(500).json({ mensagem:  error.message });
+        if (error instanceof ValidationError) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        if (error instanceof NotFoundError) {
+            return res.status(404).json({ error: error.message });
+        }
+
+        return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
 
     }
 }
@@ -73,13 +79,22 @@ const excluirProduto = async (req, res) => {
     try {
         const produto = new Produto();
         await produto.excluirProduto(id);
+
         res.status(200).json({ message: 'Produto excluído com sucesso' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+
+        if (error instanceof ValidationError) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        if (error instanceof NotFoundError) {
+            return res.status(404).json({ error: error.message });
+        }
+
+        return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
+
     }
 }
-
-
 
 const listarProdutosCategoria = async (req, res) => {
     const categoriaId = req.params.categoria_id;

@@ -42,7 +42,11 @@ class Produto {
 
     async editarProduto(id, dadosAtualizados) {
         try {
+
             const produtoExistente = await verificarProdutoPorId(id);
+            if (!produtoExistente) {
+                throw new NotFoundError('Produto não encontrado.');
+            }
 
             const camposParaAtualizar = {
                 nome_produto: dadosAtualizados.nome_produto || produtoExistente.nome_produto,
@@ -53,12 +57,16 @@ class Produto {
                 tempo_preparo: dadosAtualizados.tempo_preparo || produtoExistente.tempo_preparo
             };
 
+            const { error } = schemaProduto.validate(camposParaAtualizar);
+            if (error) {
+                throw new ValidationError(error.details[0].message);
+            }
+
             if (dadosAtualizados.categoria_id) {
                 const categoriaExiste = await verificarCategoriaExistente(camposParaAtualizar.categoria_id);
 
-                console.log(categoriaExiste);
                 if (!categoriaExiste) {
-                    throw new Error('A categoria especificada não existe.');
+                    throw new NotFoundError('A categoria especificada não existe.');
                 }
             }
 
@@ -80,20 +88,34 @@ class Produto {
             return camposParaAtualizar;
 
         } catch (error) {
-            throw new Error('Erro ao atualizar o produto: ' + error.message);
-
+            if (error instanceof ValidationError) {
+                throw error;
+            } else if (error instanceof NotFoundError) {
+                throw error;
+            } else {
+                throw new Error('Erro ao atualizar o produto: ' + error.message);
+            }
         }
     }
 
     async excluirProduto(id) {
         try {
             const produtoExistente = await verificarProdutoPorId(id);
+            if (!produtoExistente) {
+                throw new NotFoundError('Produto não encontrado.');
+            }
 
             const queryDeletarProduto = `DELETE FROM produtos WHERE id = $1`;
             await pool.query(queryDeletarProduto, [id])
 
+            return { success: true, message: 'Produto excluído com sucesso.' };
+
         } catch (error) {
-            throw new Error('Erro ao excluir o produto: ' + error.message);
+            if (error instanceof NotFoundError) {
+                throw error;
+            } else {
+                throw new Error('Erro ao excluir o produto: ' + error.message);
+            }
         }
     }
 
@@ -141,16 +163,24 @@ async function verificarProdutoCadastrado(nome_produto) {
 
 async function verificarProdutoPorId(id) {
     try {
+        if (isNaN(id) || id <= 0) {
+            throw new ValidationError('ID inválido.');
+        }
+
         const queryVerificarProduto = 'SELECT * FROM produtos WHERE id = $1';
         const resultVerificarProduto = await pool.query(queryVerificarProduto, [id]);
 
         if (resultVerificarProduto.rows.length === 0) {
-            throw new Error('Produto não encontrado.');
+            throw new NotFoundError('Produto não encontrado.');
         }
 
         return resultVerificarProduto.rows[0];
     } catch (error) {
-        throw new Error('Erro ao verificar produto: ' + error.message);
+        if (error instanceof ValidationError || error instanceof NotFoundError) {
+            throw error;
+        } else {
+            throw new Error('Erro ao verificar produto: ' + error.message);
+        }
     }
 }
 

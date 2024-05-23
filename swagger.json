@@ -124,11 +124,113 @@
                     "400": {
                         "description": "Erro de validação"
                     },
+                    "401": {
+                        "description": "Você precisa estar autenticado para acessar esta rota."
+                    },
                     "404": {
                         "description": "A categoria especificada não existe."
                     },
                     "409": {
                         "description": "Este produto já foi cadastrado anteriormente."
+                    }
+                }
+            }
+        },
+        "/editarproduto/{id}": {
+            "patch": {
+                "sumary": "Editar produto",
+                "description": "Rota para editar informação(ões) de um produto cadastrado no banco de dados.",
+                "tags": [
+                    "Produtos"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID do produto a ser editado"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Produto"
+                            },
+                            "examples": {
+                                "cliente": {
+                                    "value": {
+                                        "nome_produto": "Sprite",
+                                        "preco": 499,
+                                        "categoria_id": 3,
+                                        "descricao": "Lata de 350ml de refrigerante Sprite.",
+                                        "imagem": "https://exemplo.com/imagem/sprite.jpg",
+                                        "tempo_preparo": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Produto atualizado com sucesso."
+                    },
+                    "400": {
+                        "description": "Erro de validação de dado."
+                    },
+                    "401": {
+                        "description": "Você precisa estar autenticado para acessar esta rota."
+                    },
+                    "404": {
+                        "description": "Produto/categoria não existe."
+                    }
+                }
+            }
+        },
+        "/excluirproduto/{id}": {
+            "delete": {
+                "sumary": "Excluir produto",
+                "description": "Rota para excluir um produto cadastrado no banco de dados.",
+                "tags": [
+                    "Produtos"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID do produto a ser excluído."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Produto excluído com sucesso."
+                    },
+                    "400": {
+                        "description": "Erro de validação de dado."
+                    },
+                    "401": {
+                        "description": "Você precisa estar autenticado para acessar esta rota."
+                    },
+                    "404": {
+                        "description": "Produto não encontrado."
                     }
                 }
             }
