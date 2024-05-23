@@ -24,22 +24,26 @@ describe('Cliente', () => {
     describe('cadastrar', () => {
         it('deve retornar true quando o cliente é cadastrado com sucesso', async () => {
             schemaCliente.validate.mockReturnValue({ error: null });
-            pool.query.mockResolvedValue({ rowCount: 1 });
-        
-            const cliente = new Cliente(nome, email, cpf);
+            pool.query.mockResolvedValueOnce({ rows: [], rowCount: 0 })  
+                        .mockResolvedValueOnce({ rows: [], rowCount: 0 })  
+                        .mockResolvedValue({ rowCount: 1 });  
+    
+            const cliente = new Cliente('nome', 'email', 'cpf');
             const result = await cliente.cadastrar();
-        
+    
             expect(result).toBe(true);
         });
         
         it('deve retornar um objeto de erro quando houver falha no cadastro do cliente', async () => {
             schemaCliente.validate.mockReturnValue({ error: null });
-            pool.query.mockResolvedValue({ rowCount: 0 });
-        
-            const cliente = new Cliente(nome, email, cpf);
+            pool.query.mockResolvedValueOnce({ rows: [], rowCount: 0 })  
+                        .mockResolvedValueOnce({ rows: [], rowCount: 0 })  
+                        .mockResolvedValue({ rowCount: 0 });  
+    
+            const cliente = new Cliente('nome', 'email', 'cpf');
             const result = await cliente.cadastrar();
-        
-            expect(result).toBe(false);
+    
+            expect(result).toEqual({ error: 'Erro ao cadastrar cliente: Erro ao cadastrar cliente' });
         });
 
         it('deve retornar erro quando a validação falha', async () => {
