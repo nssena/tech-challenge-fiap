@@ -21,8 +21,6 @@ const adicionarProduto = async (req, res) => {
 
         const adicionarProduto = await produto.adicionarProduto();
 
-        console.log(adicionarProduto);
-
         return res.status(200).json({ mensagem: adicionarProduto.message });
 
     } catch (error) {
@@ -99,15 +97,28 @@ const excluirProduto = async (req, res) => {
 const listarProdutosCategoria = async (req, res) => {
     const categoriaId = req.params.categoria_id;
 
+    if (isNaN(categoriaId) || categoriaId <= 0) {
+        return res.status(400).json({ error: 'ID da categoria inválido' });
+    }
+
     try {
         const produto = new Produto();
         const produtosPorCategoria = await produto.listarProdutosPorCategoria(categoriaId);
 
         res.status(200).json(produtosPorCategoria);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        if (error instanceof ValidationError) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        if (error instanceof NotFoundError) {
+            return res.status(404).json({ error: error.message });
+        }
+
+        return res.status(500).json({ mensagem: 'Erro interno do servidor.' });
     }
 }
+
 
 module.exports = {
     usuarioAutenticado,

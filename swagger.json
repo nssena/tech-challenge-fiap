@@ -234,6 +234,80 @@
                     }
                 }
             }
+        },
+        "/produtos/categoria/{categoria_id}": {
+            "get": {
+                "sumary": "Listar produtos por categoria",
+                "description": "Rota para listar produtos de acordo com a categoria cadastrada.",
+                "tags": [
+                    "Produtos"
+                ],
+                "parameters": [
+                    {
+                        "name": "categoria_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID da categoria buscada."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 6
+                                            },
+                                            "nome_produto": {
+                                                "type": "string",
+                                                "example": "Sprite"
+                                            },
+                                            "preco": {
+                                                "type": "integer",
+                                                "example": 399
+                                            },
+                                            "categoria_id": {
+                                                "type": "integer",
+                                                "example": 3
+                                            },
+                                            "descricao": {
+                                                "type": "string",
+                                                "example": "Lata de 350ml de refrigerante Sprite."
+                                            },
+                                            "imagem": {
+                                                "type": "string",
+                                                "example": "https://exemplo.com/imagem/sprite.jpg"
+                                            },
+                                            "tempo_preparo": {
+                                                "type": "integer",
+                                                "example": 15
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID da categoria inválido."
+                    },
+                    "404": {
+                        "description": "Nenhum produto encontrado para esta categoria."
+                    },
+                    "500": {
+                        "description": "Erro ao listar produtos por categoria"
+                    }
+                }
+            }
         }
     },
     "components": {

@@ -121,12 +121,25 @@ class Produto {
 
     async listarProdutosPorCategoria(categoriaId) {
         try {
+
+            if (isNaN(categoriaId) || categoriaId <= 0) {
+                throw new ValidationError('ID da categoria inválido.');
+            }
+
             const queryListarProdutos = 'SELECT * FROM produtos WHERE categoria_id = $1';
             const resultado = await pool.query(queryListarProdutos, [categoriaId]);
 
+            if (resultado.rows.length === 0) {
+                throw new NotFoundError('Nenhum produto encontrado para esta categoria.');
+            }
+
             return resultado.rows;
         } catch (error) {
-            throw new Error('Erro ao listar produtos por categoria: ' + error.message);
+            if (error instanceof ValidationError || error instanceof NotFoundError) {
+                throw error;
+            } else {
+                throw new Error('Erro ao listar produtos por categoria: ' + error.message);
+            }
         }
     }
 }
