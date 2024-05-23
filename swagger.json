@@ -18,7 +18,7 @@
     "paths": {
         "/cadastrar": {
             "post": {
-                "sumary": "Cadastro de cliente",
+                "summary": "Cadastrar cliente",
                 "description": "Essa rota permite cadastrar um novo cliente na base de dados",
                 "tags": [
                     "Clientes"
@@ -53,7 +53,7 @@
         },
         "/identificar": {
             "post": {
-                "sumary": "Identificação de cliente",
+                "summary": "Identificar cliente",
                 "description": "Permite identificar o cliente através do cpf cadastrado no sistema",
                 "tags": [
                     "Clientes"
@@ -86,7 +86,7 @@
         },
         "/listarclientes": {
             "get": {
-                "sumary": "Listar todos os clientes",
+                "summary": "Listar todos os clientes cadastrados",
                 "description": "Rota para ver todos os clientes cadastrados no banco de dados",
                 "tags": [
                     "Clientes"
@@ -141,7 +141,7 @@
         },
         "/cadastrarproduto": {
             "post": {
-                "sumary": "Cadastro de produto",
+                "summary": "Cadastrar produto",
                 "description": "Rota para cadastrar um novo produto na base de dados",
                 "tags": [
                     "Produtos"
@@ -193,7 +193,7 @@
         },
         "/editarproduto/{id}": {
             "patch": {
-                "sumary": "Editar produto",
+                "summary": "Editar produto",
                 "description": "Rota para editar informação(ões) de um produto cadastrado no banco de dados.",
                 "tags": [
                     "Produtos"
@@ -253,7 +253,7 @@
         },
         "/excluirproduto/{id}": {
             "delete": {
-                "sumary": "Excluir produto",
+                "summary": "Excluir produto",
                 "description": "Rota para excluir um produto cadastrado no banco de dados.",
                 "tags": [
                     "Produtos"
@@ -292,7 +292,7 @@
         },
         "/categoria/{categoria_id}": {
             "get": {
-                "sumary": "Listar produtos por categoria",
+                "summary": "Listar produtos por categoria",
                 "description": "Rota para listar produtos de acordo com a categoria cadastrada.",
                 "tags": [
                     "Produtos"
@@ -366,7 +366,7 @@
         },
         "/novopedido": {
             "post": {
-                "sumary": "Novo pedido",
+                "summary": "Fazer um pedido",
                 "description": "Rota para realizar um novo pedido.",
                 "tags": [
                     "Pedidos"
@@ -414,6 +414,96 @@
                                         "qrCode": {
                                             "type": "string",
                                             "example": "00020101021243650016COM.MERCADOLIBRE020130636850d04f8-68ae-4203-83bd-a95418a62a415204000053039865802BR5909Test Test6009SAO PAULO62070503***630434EE"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/finalizarpedido": {
+            "post": {
+                "summary": "Finalizar pedido com base na notificação de pagamento",
+                "description": "Dados da notificação de pagamento",
+                "tags": [
+                    "Pedidos"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "resource": {
+                                        "type": "string",
+                                        "example": "https://api.mercadolibre.com/merchant_orders/123456789"
+                                    }
+                                },
+                                "required": [
+                                    "resource"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notificação de pagamento recebida com sucesso.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Notificação de pagamento recebida com sucesso."
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao lidar com a notificação de pagamento.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Erro ao lidar com a notificação de pagamento."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/listarPedidos": {
+            "get": {
+                "summary": "Lista todos os pedidos pagos",
+                "description": "Uma lista com os pedidos pagos, sua ordem de finalização, tempo estimado de entrega e status atual.",
+                "tags": [
+                    "Pedidos"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de pedidos retornada com sucesso.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "pedido_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "tempo_estimado_entrega": {
+                                                "type": "string",
+                                                "example": "15"
+                                            },
+                                            "status_pedido": {
+                                                "type": "string",
+                                                "example": "em andamento"
+                                            }
                                         }
                                     }
                                 }

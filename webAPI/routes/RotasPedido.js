@@ -16,4 +16,3 @@ rotasPedido.post('/finalizarpedido', finalizarPedido)
 //Listar pedidos feitos
 
 rotasPedido.get('/listarPedidos', listarPedidos);
-

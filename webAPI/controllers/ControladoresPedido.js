@@ -109,12 +109,15 @@ const listarPedidos = async (req, res) => {
     const { rows } = await pool.query(queryListarPedidos);
 
     if (rows.length === 0) {
-      return res.status(404).json({ mensagem: "Nenhum pedido encontrado" });
+      throw new NotFoundError("Nenhum pedido encontrado");
     }
 
     return res.status(200).json(rows);
   } catch (error) {
-    console.error("Erro ao listar pedidos:", error);
+
+    if (error instanceof NotFoundError) {
+      return res.status(error.statusCode).json({ mensagem: error.message });
+    }
     return res.status(500).json({ mensagem: "Erro ao listar pedidos: " + error.message });
   }
 }
