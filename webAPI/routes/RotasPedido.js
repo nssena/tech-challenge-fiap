@@ -1,5 +1,6 @@
 const express = require('express');
 const { fazerPedido, finalizarPedido, listarPedidos, cadastrarTelefone, mudarStatusPedidoParaProntoEntrega } = require('../controllers/ControladoresPedido');
+const { usuarioAutenticado } = require('../controllers/ControladoresProdutos');
 
 const rotasPedido = express();
 
@@ -23,4 +24,4 @@ rotasPedido.get('/listarPedidos', listarPedidos);
 
 //Atualizar o status do pedido para pronto para entrega
 
-rotasPedido.post('/prontoparaentrega', mudarStatusPedidoParaProntoEntrega)
+rotasPedido.post('/prontoparaentrega', usuarioAutenticado, mudarStatusPedidoParaProntoEntrega)
