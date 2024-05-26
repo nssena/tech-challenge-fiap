@@ -1,6 +1,7 @@
 const { schemaDetalhesPedido } = require("../validation/schemas");
 const pool = require('../../infrastructure/persistence/Database');
 const { MercadoPagoAPI, QrCode } = require("./MercadoPago");
+const { NotFoundError } = require("../validation/validationError");
 require('dotenv').config();
 
 class Pedido {
@@ -40,7 +41,7 @@ class Pedido {
             }
 
         } catch (error) {
-            throw new Error('Erro ao adicionar item ao pedido: ' + error.message);
+            throw error;
         }
     }
 
