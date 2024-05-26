@@ -89,10 +89,14 @@ const schemaProduto = Joi.object({
     })
 })
 
+//Schemma número de telefone
+
+const schemaTelefone = Joi.string().pattern(/^55\d{11}$/).required();
 
 module.exports = {
     schemaCliente,
     schemaCPF,
     schemaDetalhesPedido,
-    schemaProduto
+    schemaProduto,
+    schemaTelefone
 }

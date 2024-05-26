@@ -16,12 +16,12 @@ rotasPedido.post('/finalizarpedido', finalizarPedido)
 
 //Cadastrar telefone para notificação
 
-rotasPedido.post('/cadastrarTelefone', cadastrarTelefone)
+rotasPedido.post('/cadastrartelefone', cadastrarTelefone)
 
 //Listar pedidos feitos
 
 rotasPedido.get('/listarPedidos', listarPedidos);
 
-//Atualizar o status do pedido para pronto para entrega
+//Atualizar o status do pedido para pronto para entrega e enviar notificação para o cliente
 
-rotasPedido.post('/prontoparaentrega', usuarioAutenticado, mudarStatusPedidoParaProntoEntrega)
+rotasPedido.post('/prontoparaentrega/:pedido_id', usuarioAutenticado, mudarStatusPedidoParaProntoEntrega)

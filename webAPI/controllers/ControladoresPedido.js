@@ -3,6 +3,8 @@ const Pedido = require("../../domain/model/Pedido");
 const axios = require('axios');
 const pool = require("../../infrastructure/persistence/Database");
 const { ValidationError, NotFoundError } = require("../../domain/validation/validationError");
+const enviarSMS = require("./ControladorNotificação");
+const { schemaTelefone } = require("../../domain/validation/schemas");
 require('dotenv').config();
 
 
@@ -99,6 +101,33 @@ const finalizarPedido = async (req, res) => {
   }
 };
 
+
+//Opção para cadastrar número do cliente que deseja receber a notificação por celular
+const cadastrarTelefone = async (req, res) => {
+  const { pedido_id, telefone } = req.body
+  try {
+    const { error } = schemaTelefone.validate(telefone)
+    if (error) {
+      throw new ValidationError('Número de telefone inválido. O número deve seguir o padrão 5571996677138.');
+    }
+
+    const queryAdicionarTelefone = 'UPDATE pedidos SET telefone = $1 WHERE pedido_id = $2';
+    const novoTelefoneCadastrado = await pool.query(queryAdicionarTelefone, [telefone, pedido_id])
+
+    if (novoTelefoneCadastrado.rowCount > 0) {
+      res.status(200).send('Telefone cadastrado com sucesso, aguarde a notificação através deste número.');
+    } else {
+      throw new NotFoundError('Pedido não encontrado para atualizar o telefone.');
+    }
+  } catch (error) {
+    if (error instanceof ValidationError || error instanceof NotFoundError) {
+      res.status(error.statusCode).json({ mensagem: error.message });
+    } else {
+      res.status(500).send('Erro interno ao cadastrar telefone.');
+    }
+  }
+}
+
 const mudarStatusPedidoParaProntoEntrega = async (req, res) => {
   const { pedido_id } = req.params;
 
@@ -110,32 +139,44 @@ const mudarStatusPedidoParaProntoEntrega = async (req, res) => {
 
     await pool.query('UPDATE pedidos SET status_pedido = $1 WHERE pedido_id = $2', ['pronto para entrega', pedido_id]);
 
-    res.status(200).json({ mensagem: 'Status do pedido atualizado para pronto para entrega.' });
+    //Enviar notificação para o cliente
+
+    // const telefoneCliente = pedido.rows[0].telefone;
+
+    const cliente_id = pedido.rows[0].cliente_id
+
+    const cliente = await pool.query('SELECT telefone FROM clientes WHERE cliente_id = $1', [cliente_id]);
+    if (cliente.rowCount === 0) {
+      throw new NotFoundError('Cliente não encontrado.');
+    }
+
+    await pool.query('SELECT telefone FROM clientes WHERE cliente_id = $1', [cliente_id])
+
+    const telefone = cliente_id.rows[0].telefone
+
+    console.log(telefone);
+
+    // if (!telefoneCliente || telefoneCliente.trim() === '') {
+    //   throw new ValidationError('Telefone do cliente não está disponível para enviar SMS.');
+    // }
+
+    // const mensagem = "Seu pedido está pronto para entrega!";
+    // const smsEnviado = await enviarSMS(telefoneCliente, mensagem);
+
+    // if (!smsEnviado) {
+    //   res.status(200).json({ mensagem: 'Status do pedido atualizado para pronto para entrega, mas houve um erro ao enviar a notificação por SMS.' });
+    // } else {
+    //   res.status(200).json({ mensagem: 'Status do pedido atualizado para pronto para entrega. Notificação por SMS enviada com sucesso.' });
+    // }
+
   } catch (error) {
-    if (error instanceof NotFoundError) {
+    if (error instanceof NotFoundError || error instanceof ValidationError) {
       res.status(error.statusCode).json({ mensagem: error.message });
     } else {
-      console.error('Erro ao mudar o status do pedido para pronto para entrega:', error);
       res.status(500).json({ mensagem: 'Erro interno ao mudar o status do pedido para pronto para entrega.' });
     }
   }
 };
-
-
-const cadastrarTelefone = async (req, res) => {
-  const { cliente_id, telefone } = req.body
-  //pop-up para incluir número de telefone e receber a notificação
-  try {
-    const queryAdicionarTelefone = 'INSERT INTO clientes (telefone) values $1 WHERE cliente_id = $2';
-    const novoTelefoneCadastrado = await pool.query(queryAdicionarTelefone, [telefone, cliente_id])
-
-    if (novoTelefoneCadastrado.rowCount > 0) {
-      res.status(200).send('Telefone cadastrado com sucesso, aguarde a notificação através deste número.');
-    }
-  } catch (error) {
-    res.status(500).send('Erro interno ao processar a notificação.');
-  }
-}
 
 const listarPedidos = async (req, res) => {
   try {
