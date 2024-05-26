@@ -1,8 +1,8 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "API de vendas em lanchonete/restaurante com pagamento via QR Code do Mercado Pago",
-        "description": "**Com essa API, você tem total controle sobre os pedidos e produtos do seu negócio!**\n\n**Funcionalidades:**\n\n* **Gerenciamento de Clientes:**\n    * Cadastro de clientes (ou identificação de clientes já cadastrados)\n* **Gerenciamento de Pedidos:**\n    * Realização de pedidos, inclusive anônimos\n    * Pagamento via QR Code do Mercado Pago\n    * Notificações de pagamento em tempo real\n    * Acompanhamento do tempo estimado de entrega e status do pedido\n* **Gerenciamento de Produtos:**\n    * Cadastro de novos produtos\n    * Edição de informações de produtos\n    * Exclusão de produtos\n\n**Ideal para:**\n\n* Lanchonetes e restaurantes que desejam modernizar seus processos de venda\n* Empresas que buscam aumentar a eficiência e a satisfação dos seus clientes\n* Empreendedores que querem oferecer uma experiência de compra inovadora e segura\n\n**Comece a usar agora mesmo e eleve suas vendas para o próximo nível!**",
+        "title": "API de Gerenciamento de Pedidos e Clientes",
+        "description": "**Com essa API, você tem total controle sobre os pedidos e produtos do seu negócio!**\n\n**Funcionalidades:**\n\n* **Painel de usuário:**\n    * Cadastro de clientes (ou identificação de clientes já cadastrados)\n* **Painel de pedidos:**\n    * Listagem de produtos por categoria\n    * Realização de pedidos, inclusive anônimos\n    * Cadastro de telefone para envio de notificações de pedidos prontos para entrega\n    * Acompanhamento do tempo estimado de entrega e status do pedido\n* **Painel administrativo:**\n    * Listagem completa de clientes cadastrados\n    * Cadastro de novos produtos\n    * Edição de informações de produtos\n    * Exclusão de produtos\n  * Pagamento via QR code do Mercado Pago\n   * Envio de notificação de pedidos prontos para entrega\n\n**Ideal para:**\n\n* Lanchonetes e restaurantes que desejam modernizar seus processos de venda\n* Empresas que buscam aumentar a eficiência e a satisfação dos seus clientes\n* Empreendedores que querem oferecer uma experiência de compra inovadora e segura\n\n**Comece a usar agora mesmo e eleve suas vendas para o próximo nível!**",
         "termsOfService": "",
         "contact": {
             "email": "nataliasenasantos@gmail.com"
@@ -21,7 +21,7 @@
                 "summary": "Cadastrar cliente",
                 "description": "Essa rota permite cadastrar um novo cliente na base de dados",
                 "tags": [
-                    "Clientes"
+                    "Painel de usuário"
                 ],
                 "requestBody": {
                     "content": {
@@ -56,7 +56,7 @@
                 "summary": "Identificar cliente",
                 "description": "Permite identificar o cliente através do cpf cadastrado no sistema",
                 "tags": [
-                    "Clientes"
+                    "Painel de usuário"
                 ],
                 "requestBody": {
                     "content": {
@@ -89,7 +89,7 @@
                 "summary": "Listar todos os clientes cadastrados",
                 "description": "Rota para ver todos os clientes cadastrados no banco de dados",
                 "tags": [
-                    "Clientes"
+                    "Painel administrativo"
                 ],
                 "security": [
                     {
@@ -144,7 +144,7 @@
                 "summary": "Cadastrar produto",
                 "description": "Rota para cadastrar um novo produto na base de dados",
                 "tags": [
-                    "Produtos"
+                    "Painel administrativo"
                 ],
                 "security": [
                     {
@@ -196,7 +196,7 @@
                 "summary": "Editar produto",
                 "description": "Rota para editar informação(ões) de um produto cadastrado no banco de dados.",
                 "tags": [
-                    "Produtos"
+                    "Painel administrativo"
                 ],
                 "security": [
                     {
@@ -256,7 +256,7 @@
                 "summary": "Excluir produto",
                 "description": "Rota para excluir um produto cadastrado no banco de dados.",
                 "tags": [
-                    "Produtos"
+                    "Painel administrativo"
                 ],
                 "security": [
                     {
@@ -295,7 +295,7 @@
                 "summary": "Listar produtos por categoria",
                 "description": "Rota para listar produtos de acordo com a categoria cadastrada.",
                 "tags": [
-                    "Produtos"
+                    "Painel de pedidos"
                 ],
                 "parameters": [
                     {
@@ -369,7 +369,7 @@
                 "summary": "Fazer um pedido",
                 "description": "Rota para realizar um novo pedido.",
                 "tags": [
-                    "Pedidos"
+                    "Painel de pedidos"
                 ],
                 "requestBody": {
                     "content": {
@@ -423,12 +423,17 @@
                 }
             }
         },
-        "/finalizarpedido": {
+        "/checarpagamento": {
             "post": {
-                "summary": "Finalizar pedido com base na notificação de pagamento",
-                "description": "Dados da notificação de pagamento",
+                "summary": "Checar pagamento do pedido",
+                "description": "Checar se o pedido foi pago e enviar para o preparo",
                 "tags": [
-                    "Pedidos"
+                    "Painel administrativo"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
                 "requestBody": {
                     "required": true,
@@ -477,10 +482,10 @@
         },
         "/listarPedidos": {
             "get": {
-                "summary": "Lista todos os pedidos pagos",
+                "summary": "Lista todos os pedidos pagos em andamento ou prontos para entrega",
                 "description": "Uma lista com os pedidos pagos, sua ordem de finalização, tempo estimado de entrega e status atual.",
                 "tags": [
-                    "Pedidos"
+                    "Painel de pedidos"
                 ],
                 "responses": {
                     "200": {
@@ -504,6 +509,271 @@
                                                 "type": "string",
                                                 "example": "em andamento"
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/cadastrartelefone": {
+            "post": {
+                "summary": "Cadastrar número de telefone para um pedido",
+                "description": "Esta rota permite cadastrar um número de telefone para um pedido existente.",
+                "tags": [
+                    "Painel de pedidos"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Objeto contendo os dados do pedido",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "pedido_id": {
+                                    "type": "string",
+                                    "description": "ID do pedido",
+                                    "example": "123456"
+                                },
+                                "telefone": {
+                                    "type": "string",
+                                    "description": "Número de telefone a ser cadastrado",
+                                    "example": "71999999999"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Telefone cadastrado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Telefone cadastrado com sucesso, aguarde a notificação através deste número."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Número de telefone inválido. O número deve seguir o padrão 71999999999."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pedido não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Pedido não encontrado para atualizar o telefone."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Erro interno ao cadastrar telefone."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/prontoparaentrega/{pedido_id}": {
+            "post": {
+                "summary": "Atualizar status do pedido para pronto para entrega",
+                "description": "Esta rota permite atualizar o status de um pedido para 'pronto para entrega' e enviar uma notificação por SMS para o cliente.",
+                "tags": [
+                    "Painel administrativo"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "pedido_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "ID do pedido a ser atualizado"
+                        },
+                        "example": "123456"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status do pedido atualizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Status do pedido atualizado para pronto para entrega. Notificação por SMS enviada com sucesso."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Não há telefone disponível para enviar SMS."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pedido não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Pedido não encontrado."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Erro interno ao mudar o status do pedido para pronto para entrega."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pedidofinalizado/{pedido_id}": {
+            "post": {
+                "summary": "Atualizar status do pedido para finalizado",
+                "description": "Esta rota permite atualizar o status de um pedido para 'finalizado' no banco de dados.",
+                "tags": [
+                    "Painel administrativo"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "pedido_id",
+                        "in": "path",
+                        "description": "ID do pedido a ser atualizado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status do pedido atualizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Status do pedido atualizado para finalizado."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pedido não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Pedido não encontrado."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensagem": {
+                                            "type": "string",
+                                            "example": "Erro interno ao atualizar o status do pedido para finalizado."
                                         }
                                     }
                                 }

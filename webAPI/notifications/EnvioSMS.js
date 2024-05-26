@@ -6,7 +6,7 @@ const enviarMensagem = async (mensagem, para) => {
   try {
     const message = await client.messages.create({
       body: mensagem,
-      from: '+13205370863', 
+      from: process.env.SEU_NUMERO_TWILIO, 
       to: para
     });
     return message.sid;

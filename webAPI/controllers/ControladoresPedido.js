@@ -32,7 +32,7 @@ const fazerPedido = async (req, res) => {
   }
 }
 
-const finalizarPedido = async (req, res) => {
+const checarPagamento = async (req, res) => {
   // Função para checar o status do pagamento
   const checarStatusPagamento = async (orderId, accessToken) => {
     try {
@@ -111,7 +111,7 @@ const cadastrarTelefone = async (req, res) => {
       throw new ValidationError('Número de telefone inválido. O número deve seguir o padrão 5571996677138.');
     }
 
-    const telefoneComMais = `+${telefone}`
+    const telefoneComMais = `+55${telefone}`
 
     const queryAdicionarTelefone = 'UPDATE pedidos SET telefone = $1 WHERE pedido_id = $2';
     const novoTelefoneCadastrado = await pool.query(queryAdicionarTelefone, [telefoneComMais, pedido_id])
@@ -167,13 +167,38 @@ const mudarStatusPedidoParaProntoEntrega = async (req, res) => {
   }
 };
 
+const mudarStatusPedidoParaFinalizado = async (req, res) => {
+  const { pedido_id } = req.params;
+
+  try {
+    const pedido = await pool.query('SELECT * FROM pedidos WHERE pedido_id = $1', [pedido_id]);
+    if (pedido.rowCount === 0) {
+      throw new NotFoundError('Pedido não encontrado.');
+    }
+
+    await pool.query('UPDATE pedidos SET status_pedido = $1 WHERE pedido_id = $2', ['finalizado', pedido_id]);
+
+    res.status(200).json({ mensagem: 'Status do pedido atualizado para finalizado.' });
+
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      res.status(error.statusCode).json({ mensagem: error.message });
+    } else {
+      res.status(500).json({ mensagem: 'Erro interno ao atualizar o status do pedido para finalizado.' });
+    }
+  }
+};
+
+
 const listarPedidos = async (req, res) => {
   try {
     const queryListarPedidos = `
-      SELECT pedido_id, tempo_estimado_entrega, status_pedido
-      FROM pedidos
-      WHERE pagamento = true
+    SELECT pedido_id, tempo_estimado_entrega, status_pedido
+    FROM pedidos
+    WHERE pagamento = true
+    AND (status_pedido = 'pronto para entrega' OR status_pedido = 'em andamento');    
     `;
+    
     const { rows } = await pool.query(queryListarPedidos);
 
     if (rows.length === 0) {
@@ -192,8 +217,9 @@ const listarPedidos = async (req, res) => {
 
 module.exports = {
   fazerPedido,
-  finalizarPedido,
+  checarPagamento,
   mudarStatusPedidoParaProntoEntrega,
+  mudarStatusPedidoParaFinalizado,
   cadastrarTelefone,
   listarPedidos
 }
