@@ -83,7 +83,7 @@ const finalizarPedido = async (req, res) => {
     const { resource } = req.body;
 
     const orderId = resource.split('/').pop();
-    const accessToken = "TEST-5964076815976378-051520-8a77a9bead5df7df19b07595bfdef256-1795241025";
+    const accessToken = process.env.YOUR_ACCESS_TOKEN;
 
     const { statusPagamento, externalReference } = await checarStatusPagamento(orderId, accessToken);
 

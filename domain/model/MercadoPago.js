@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 class MercadoPagoAPI {
     constructor() {
-        this.accessToken = "TEST-5964076815976378-051520-8a77a9bead5df7df19b07595bfdef256-1795241025";
+        this.accessToken = process.env.YOUR_ACCESS_TOKEN;
         this.baseURL = 'https://api.mercadopago.com';
         this.headers = {
             'Content-Type': 'application/json',
