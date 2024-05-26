@@ -1,5 +1,5 @@
 const pool = require("../../infrastructure/persistence/Database");
-const { schemaProduto } = require("../validation/schemas");
+const { schemaProduto, schemaEdicaoProduto } = require("../validation/schemas");
 const { NotFoundError, ConflictError, ValidationError } = require("../validation/validationError");
 
 class Produto {
@@ -57,7 +57,7 @@ class Produto {
                 tempo_preparo: dadosAtualizados.tempo_preparo || produtoExistente.tempo_preparo
             };
 
-            const { error } = schemaProduto.validate(camposParaAtualizar);
+            const { error } = schemaEdicaoProduto.validate(camposParaAtualizar);
             if (error) {
                 throw new ValidationError(error.details[0].message);
             }

@@ -93,10 +93,42 @@ const schemaProduto = Joi.object({
 
 const schemaTelefone = Joi.string().pattern(/^55\d{11}$/).required();
 
+//Schema específico para edição de produto, neste caso, pelo menos um dos itens tem que ser preenchidos epode haver campos não preenchidos
+
+const schemaEdicaoProduto = Joi.object({
+    nome_produto: Joi.string().trim().max(100).messages({
+        'string.empty': 'O nome do produto não pode estar vazio.',
+        'string.trim': 'O nome do produto não pode conter apenas espaços em branco.',
+        'string.max': 'O nome do produto deve ter no máximo {{#limit}} caracteres.'
+    }),
+    preco: Joi.number().integer().positive().messages({
+        'number.base': 'O preço deve ser um número inteiro.',
+        'number.integer': 'O preço deve ser um número inteiro.',
+        'number.positive': 'O preço deve ser um número positivo.'
+    }),
+    categoria_id: Joi.number().integer().positive().messages({
+        'number.base': 'A categoria deve ser um número inteiro.',
+        'number.positive': 'A categoria deve ser um número positivo.'
+    }),
+    descricao: Joi.string().allow('').max(255).messages({
+        'string.max': 'A descrição deve ter no máximo {{#limit}} caracteres.'
+    }),
+    imagem: Joi.string().allow('').uri().max(255).messages({
+        'string.uri': 'A URL da imagem não é válida.',
+        'string.max': 'A URL da imagem deve ter no máximo {{#limit}} caracteres.'
+    }),
+    tempo_preparo: Joi.number().integer().min(0).messages({
+        'number.base': 'O tempo de preparo deve ser um número inteiro.',
+        'number.integer': 'O tempo de preparo deve ser um número inteiro.',
+        'number.min': 'O tempo de preparo deve ser igual ou maior que zero.'
+    })
+}).required().min(1);
+
 module.exports = {
     schemaCliente,
     schemaCPF,
     schemaDetalhesPedido,
     schemaProduto,
+    schemaEdicaoProduto,
     schemaTelefone
 }

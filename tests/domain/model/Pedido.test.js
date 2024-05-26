@@ -1,14 +1,12 @@
 const Pedido = require('../../../domain/model/Pedido');
 const { NotFoundError } = require('../../../domain/validation/validationError');
-const { MercadoPagoAPI, QrCode } = require('../../../domain/model/MercadoPago');
+const { MercadoPagoAPI } = require('../../../domain/model/MercadoPago');
 
 
-// Mock para o pool de banco de dados
 jest.mock('../../../infrastructure/persistence/Database', () => ({
     query: jest.fn(),
 }));
 
-// Mock para dotenv
 jest.mock('dotenv', () => ({
     config: jest.fn(),
 }));
@@ -19,14 +17,12 @@ describe('Pedido', () => {
             const pedido = new Pedido(1);
             const detalhes_pedido = [{ produto_id: 1, preco: 399, quantidade: 2 }];
 
-            // Mock para validarAsync
             const mockValidateAsync = jest.fn().mockResolvedValue();
             const mockSchemaDetalhesPedido = { validateAsync: mockValidateAsync };
             jest.mock('../../../domain/validation/schemas', () => ({
                 schemaDetalhesPedido: mockSchemaDetalhesPedido,
             }));
 
-            // Mock para query
             const mockQuery = jest.fn().mockResolvedValue({ rows: [{ tempo_preparo: 10 }] });
             require('../../../infrastructure/persistence/Database').query.mockImplementation(mockQuery);
 
