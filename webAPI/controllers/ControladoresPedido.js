@@ -3,8 +3,8 @@ const Pedido = require("../../domain/model/Pedido");
 const axios = require('axios');
 const pool = require("../../infrastructure/persistence/Database");
 const { ValidationError, NotFoundError } = require("../../domain/validation/validationError");
-const enviarSMS = require("./ControladorNotificação");
 const { schemaTelefone } = require("../../domain/validation/schemas");
+const enviarMensagem = require("../notifications/EnvioSMS");
 require('dotenv').config();
 
 
@@ -111,8 +111,10 @@ const cadastrarTelefone = async (req, res) => {
       throw new ValidationError('Número de telefone inválido. O número deve seguir o padrão 5571996677138.');
     }
 
+    const telefoneComMais = `+${telefone}`
+
     const queryAdicionarTelefone = 'UPDATE pedidos SET telefone = $1 WHERE pedido_id = $2';
-    const novoTelefoneCadastrado = await pool.query(queryAdicionarTelefone, [telefone, pedido_id])
+    const novoTelefoneCadastrado = await pool.query(queryAdicionarTelefone, [telefoneComMais, pedido_id])
 
     if (novoTelefoneCadastrado.rowCount > 0) {
       res.status(200).send('Telefone cadastrado com sucesso, aguarde a notificação através deste número.');
@@ -139,35 +141,22 @@ const mudarStatusPedidoParaProntoEntrega = async (req, res) => {
 
     await pool.query('UPDATE pedidos SET status_pedido = $1 WHERE pedido_id = $2', ['pronto para entrega', pedido_id]);
 
-    //Enviar notificação para o cliente
+    const telefone = pedido.rows[0].telefone
 
-    // const telefoneCliente = pedido.rows[0].telefone;
+    // Enviar notificação para o cliente
 
-    const cliente_id = pedido.rows[0].cliente_id
-
-    const cliente = await pool.query('SELECT telefone FROM clientes WHERE cliente_id = $1', [cliente_id]);
-    if (cliente.rowCount === 0) {
-      throw new NotFoundError('Cliente não encontrado.');
+    if (!telefone || telefone.trim() === '') { 
+      throw new ValidationError('Não há telefone disponível para enviar SMS.');
     }
 
-    await pool.query('SELECT telefone FROM clientes WHERE cliente_id = $1', [cliente_id])
+    const mensagem = "Seu pedido está pronto para entrega!";
+    const smsEnviado = await enviarMensagem(mensagem, telefone);
 
-    const telefone = cliente_id.rows[0].telefone
-
-    console.log(telefone);
-
-    // if (!telefoneCliente || telefoneCliente.trim() === '') {
-    //   throw new ValidationError('Telefone do cliente não está disponível para enviar SMS.');
-    // }
-
-    // const mensagem = "Seu pedido está pronto para entrega!";
-    // const smsEnviado = await enviarSMS(telefoneCliente, mensagem);
-
-    // if (!smsEnviado) {
-    //   res.status(200).json({ mensagem: 'Status do pedido atualizado para pronto para entrega, mas houve um erro ao enviar a notificação por SMS.' });
-    // } else {
-    //   res.status(200).json({ mensagem: 'Status do pedido atualizado para pronto para entrega. Notificação por SMS enviada com sucesso.' });
-    // }
+    if (!smsEnviado) {
+      res.status(200).json({ mensagem: 'Status do pedido atualizado para pronto para entrega, mas houve um erro ao enviar a notificação por SMS.' });
+    } else {
+      res.status(200).json({ mensagem: 'Status do pedido atualizado para pronto para entrega. Notificação por SMS enviada com sucesso.' });
+    }
 
   } catch (error) {
     if (error instanceof NotFoundError || error instanceof ValidationError) {
