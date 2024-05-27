@@ -2,9 +2,9 @@
   "name": "tech-challeng-fiap",
   "version": "1.0.0",
   "description": "Projeto do Tech Challeng da Pós de Arquitetura de Software da FIAP",
-  "main": "server.js",
+  "main": "config/server.js",
   "scripts": {
-    "dev": "nodemon ./config/server.js",
+    "dev": "nodemon src/config/server.js",
     "test": "jest"
   },
   "author": "Natália Sena",
