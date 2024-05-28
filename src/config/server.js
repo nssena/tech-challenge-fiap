@@ -4,6 +4,8 @@ const rotasPedido = require('../webAPI/routes/RotasPedido');
 const rotasProdutos = require('../webAPI/routes/RotasProdutos');
 const swaggerUI = require('swagger-ui-express');
 const swaggerDocs = require('../../swagger.json');
+require('dotenv').config();
+
 
 const app = express();
 

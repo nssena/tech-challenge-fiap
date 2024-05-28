@@ -5,9 +5,9 @@ services:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_USER: ${USER}
-      POSTGRES_PASSWORD: ${PASSWORD}
-      POSTGRES_DB: ${DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
@@ -19,17 +19,19 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-    command: npm start
+    command: npm run dev
     environment:
       NODE_ENV: development
-      DB_HOST: ${HOST}
-      DB_USER: ${USER}
-      DB_PASSWORD: ${PASSWORD}
-      DB_NAME: ${DATABASE}
+      DB_HOST: db
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
     ports:
       - "3000:3000"
     depends_on:
       - db
+    
+    
 
 volumes:
   db_data:
