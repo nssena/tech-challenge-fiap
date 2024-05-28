@@ -1,34 +1,35 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${USER}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: ${DATABASE}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: tech_challenge_fiap_app
+    image: node:latest
+    container_name: node_app
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    command: npm start
+    environment:
+      NODE_ENV: development
+      DB_HOST: ${HOST}
+      DB_USER: ${USER}
+      DB_PASSWORD: ${PASSWORD}
+      DB_NAME: ${DATABASE}
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432
-      - DATABASE_USER=test_user
-      - DATABASE_PASSWORD=test_password
-      - DATABASE_NAME=test_database
     depends_on:
       - db
 
-  db:
-    image: postgres:13
-    container_name: tech_challenge_fiap_db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=test_user
-      - POSTGRES_PASSWORD=test_password
-      - POSTGRES_DB=test_database
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
 volumes:
-  postgres_data:
+  db_data:
