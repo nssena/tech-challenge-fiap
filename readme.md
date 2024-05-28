@@ -37,21 +37,21 @@ Certifique-se de ter as seguintes ferramentas instaladas em sua máquina:
 
 2. Crie um arquivo .env na raiz do projeto e adicione as seguintes variáveis de ambiente:
 
-POSTGRES_USER=seu_usuario
-POSTGRES_PASSWORD=sua_senha
-POSTGRES_DB=seu_banco_de_dados
-DB_HOST=database
+    POSTGRES_USER=seu_usuario
+    POSTGRES_PASSWORD=sua_senha
+    POSTGRES_DB=seu_banco_de_dados
+    DB_HOST=database
 
 3. Certifique-se de que o arquivo .env está no .gitignore para não versionar suas credenciais:
 
-.gitignore
-.env
+    .gitignore
+    .env
 
 ### Iniciando o Projeto
 
 Para iniciar a aplicação, execute o seguinte comando:
 
-docker-compose up --build
+    docker-compose up --build
 
 Isso construirá as imagens Docker necessárias e iniciará os serviços.
 
