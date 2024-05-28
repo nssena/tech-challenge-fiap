@@ -39,7 +39,7 @@ Certifique-se de ter as seguintes ferramentas instaladas em sua máquina:
 
 3. Certifique-se de que o arquivo .env está no .gitignore para não versionar suas credenciais:
 
-    .gitignore
+    # .gitignore
     .env
 
 ### Iniciando o Projeto
