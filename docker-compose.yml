@@ -9,29 +9,36 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    restart: always
 
   app:
-    image: node:latest
+    build: .
     container_name: node_app
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-    command: npm run dev
     environment:
-      NODE_ENV: development
-      DB_HOST: db
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_NAME: ${POSTGRES_DB}
+      - NODE_ENV=development
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+      - YOUR_ACCESS_TOKEN=${YOUR_ACCESS_TOKEN}
+      - USER_ID=${USER_ID}
+      - EXTERNAL_POS_ID=${EXTERNAL_POS_ID}
+      - SPONSOR_ID=${SPONSOR_ID}
+      - ACCOUNTSID=${ACCOUNTSID}
+      - AUTHTOKEN=${AUTHTOKEN}
+      - SEU_NUMERO_TWILIO=${SEU_NUMERO_TWILIO}
     ports:
       - "3000:3000"
     depends_on:
       - db
-    
-    
+    restart: always
 
 volumes:
   db_data:

@@ -11,6 +11,13 @@ CREATE TABLE categorias (
     nome_categoria VARCHAR(100) NOT NULL
 );
 
+INSERT INTO categorias (nome_categoria) VALUES
+    ('Lanche'),
+    ('Acompanhamento'),
+    ('Bebida'),
+    ('Sobremesa');
+
+
 CREATE TABLE produtos (
     id SERIAL PRIMARY KEY,
     nome_produto VARCHAR(100) NOT NULL,
