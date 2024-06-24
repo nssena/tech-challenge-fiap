@@ -19,7 +19,7 @@ const fazerPedido = async (req, res) => {
 
     const qrCode = await pedido.gerarQRCode(detalhes_pedido);
 
-    return res.status(200).json({ mensagem: "Pedido feito com sucesso.", qrCode: qrCode.qr_data });
+    return res.status(200).json({ mensagem: `Pedido feito com sucesso. Pedido ID: ${qrCode.pedido_id}`, qrCode: qrCode.resposta.qr_data });
   } catch (error) {
     if (error instanceof ValidationError) {
       return res.status(400).json({ mensagem: error.message });
