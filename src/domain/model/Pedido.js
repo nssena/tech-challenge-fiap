@@ -75,7 +75,7 @@ class Pedido {
         const apiUrl = `instore/orders/qr/seller/collectors/${user_id}/pos/${external_pos_id}/qrs`;
         const resposta = await MercadoPagoAPI.APIPost(apiUrl, qrCodeJSON);
 
-        return resposta;
+        return { resposta, pedido_id, qr_data: resposta.data }; 
     }
 }
 
