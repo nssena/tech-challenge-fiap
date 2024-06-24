@@ -19,7 +19,7 @@ const fazerPedido = async (req, res) => {
 
     const qrCode = await pedido.gerarQRCode(detalhes_pedido);
 
-    return res.status(200).json({ mensagem: `Pedido feito com sucesso. Pedido ID: ${qrCode.pedido_id}`, qrCode: qrCode.qr_data });
+    return res.status(200).json({ mensagem: "Pedido feito com sucesso.", qrCode: qrCode.qr_data });
   } catch (error) {
     if (error instanceof ValidationError) {
       return res.status(400).json({ mensagem: error.message });
@@ -145,7 +145,7 @@ const mudarStatusPedidoParaProntoEntrega = async (req, res) => {
 
     // Enviar notificação para o cliente
 
-    if (!telefone || telefone.trim() === '') {
+    if (!telefone || telefone.trim() === '') { 
       throw new ValidationError('Não há telefone disponível para enviar SMS.');
     }
 
@@ -198,7 +198,7 @@ const listarPedidos = async (req, res) => {
     WHERE pagamento = true
     AND (status_pedido = 'pronto para entrega' OR status_pedido = 'em andamento');    
     `;
-
+    
     const { rows } = await pool.query(queryListarPedidos);
 
     if (rows.length === 0) {
