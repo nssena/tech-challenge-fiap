@@ -130,6 +130,30 @@ const cadastrarTelefone = async (req, res) => {
   }
 }
 
+//Atualizar para pedido em preparação
+
+const mudarStatusPedidoEmPreparacao = async (req, res) => {
+  const { pedido_id } = req.params;
+
+  try {
+    const pedido = await pool.query('SELECT * FROM pedidos WHERE pedido_id = $1', [pedido_id]);
+    if (pedido.rowCount === 0) {
+      throw new NotFoundError('Pedido não encontrado.');
+    }
+
+    await pool.query('UPDATE pedidos SET status_pedido = $1 WHERE pedido_id = $2', ['em preparação', pedido_id]);
+
+    res.status(200).json({ mensagem: 'Status do pedido atualizado para "em preparação".' });
+
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      res.status(error.statusCode).json({ mensagem: error.message });
+    } else {
+      res.status(500).json({ mensagem: 'Erro interno ao atualizar o status do pedido para em "preparação".' });
+    }
+  }
+};
+
 const mudarStatusPedidoParaProntoEntrega = async (req, res) => {
   const { pedido_id } = req.params;
 
@@ -167,6 +191,7 @@ const mudarStatusPedidoParaProntoEntrega = async (req, res) => {
   }
 };
 
+//Quando o cliente retira o pedido pronto
 const mudarStatusPedidoParaFinalizado = async (req, res) => {
   const { pedido_id } = req.params;
 
@@ -196,7 +221,15 @@ const listarPedidos = async (req, res) => {
     SELECT pedido_id, tempo_estimado_entrega, status_pedido
     FROM pedidos
     WHERE pagamento = true
-    AND (status_pedido = 'pronto para entrega' OR status_pedido = 'em andamento');    
+    AND (status_pedido = 'pronto para entrega' OR status_pedido = 'em preparação' OR status_pedido = 'recebido')
+    ORDER BY 
+        CASE 
+          WHEN status_pedido = 'pronto para entrega' THEN 1
+          WHEN status_pedido = 'em preparação' THEN 2
+          WHEN status_pedido = 'recebido' THEN 3
+          ELSE 4
+        END,
+        criado_em ASC;      
     `;
     
     const { rows } = await pool.query(queryListarPedidos);
@@ -218,6 +251,7 @@ const listarPedidos = async (req, res) => {
 module.exports = {
   fazerPedido,
   checarPagamento,
+  mudarStatusPedidoEmPreparacao,
   mudarStatusPedidoParaProntoEntrega,
   mudarStatusPedidoParaFinalizado,
   cadastrarTelefone,

@@ -58,7 +58,7 @@ CREATE TABLE pedidos (
   	pagamento BOOLEAN NOT NULL DEFAULT false,
   	external_reference VARCHAR(255) NOT NULL,
   	tempo_estimado_entrega INT NOT NULL,
-  	status_pedido VARCHAR(50) NOT NULL DEFAULT 'em andamento',
+  	status_pedido VARCHAR(50) NOT NULL DEFAULT 'recebido',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (cliente_id) REFERENCES clientes(cliente_id)
 );
