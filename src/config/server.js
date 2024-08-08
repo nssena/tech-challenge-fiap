@@ -21,4 +21,8 @@ app.get('/', (req, res) => {
     res.send('Funcionando')
 })
 
+app.get('/health', (req, res) => {
+    res.status(200).send('Application is healthy');
+});
+
 app.listen(3000);

@@ -1,21 +1,20 @@
 apiVersion: v1
 kind: Pod
 metadata:
+  name: liveness-exec
   labels:
     test: liveness
-  name: liveness-exec
 spec:
   containers:
   - name: webapp-container
-    image: nathsena/tech-challenge-fiap:v2.0
-    args:
-    - /bin/sh
-    - -c
-    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+    image: nathsena/tech-challenge-fiap:v2.1
+    ports:
+    - containerPort: 3000
     livenessProbe:
-      exec:
-        command:
-        - cat
-        - /tmp/healthy
-      initialDelaySeconds: 5
-      periodSeconds: 5
+      httpGet:
+        path: /health
+        port: 3000
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
